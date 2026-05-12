@@ -1,0 +1,17 @@
+### Entornos Virtuales (CRÍTICO) ###
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+__pycache__/
+
+### Datos y Reportes (Para no subir info de asistencia real) ###
+data/*.xlsx
+data/*.csv
+data/*.json
+!data/.gitkeep
+
+### IDEs (VS Code, PyCharm) ###
+.vscode/
+.idea/

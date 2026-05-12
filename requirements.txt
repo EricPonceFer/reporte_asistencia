@@ -1,0 +1,8 @@
+# Interfaz Gráfica
+PyQt6==6.6.1
+
+# Procesamiento de Datos
+pandas==2.2.1
+
+# Motores para leer y escribir Excel
+openpyxl==3.1.2     # Fundamental para archivos .xlsx modernos
