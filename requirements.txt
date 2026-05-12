@@ -1,5 +1,5 @@
 # Interfaz Gráfica
-PyQt6==6.6.1
+PyQt6==6.4.2
 
 # Procesamiento de Datos
 pandas==2.2.1
