@@ -1,17 +1,17 @@
 from vista.interfaz_reporte import Ui_MainWindow
-from pathlib import Path
 from PyQt6.QtWidgets import (
     QMainWindow,
     QFileDialog,
     QMessageBox
 )
+from modelo.asistencia_model import AsistenciaModel
 from PyQt6 import QtCore
 
 class Controlador(QMainWindow):
 
     def __init__(self):
         super().__init__()
-
+        self.modelo = None
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
@@ -226,29 +226,30 @@ class Controlador(QMainWindow):
                 f"{nombre_archivo}.xlsx"
             )
 
-            ruta_final = (
-                Path(self.ruta_guardado)
-                / nombre_archivo
-            )
+            # ruta_final = (
+            #     Path(self.ruta_guardado)
+            #     / nombre_archivo
+            # )
 
             # ==========================================
             # PROCESAMIENTO
             # ==========================================
 
-            self.modelo.cargar_archivos(
-                self.ruta_excel,
-                self.ruta_excel
+            modelo = AsistenciaModel(
+                ruta_asistencia=self.ruta_excel,
+                ruta_guardado=self.ruta_guardado
             )
+            modelo.cargar_archivos()
+
 
             dataframe_resultado = (
-                self.modelo.procesar_asistencia()
+                modelo.procesar_asistencia()
             )
 
-            self.modelo.exportar_excel(
+            modelo.exportar_excel(
                 dataframe_resultado,
-                ruta_final
+                nombre_archivo
             )
-
             # ==========================================
             # MENSAJE FINAL
             # ==========================================

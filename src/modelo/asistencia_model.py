@@ -1,6 +1,9 @@
 import pandas as pd
 from pathlib import Path
-
+from config.config import (
+    RUTA_CODIGOS,
+    RUTA_VELADA
+)
 
 class ErrorArchivo(Exception):
     """Errores relacionados con archivos."""
@@ -67,48 +70,105 @@ class ValidadorArchivos:
 
 class AsistenciaModel:
 
-    def __init__(self):
+    def __init__(
+            self,
+            ruta_asistencia,
+            ruta_guardado
+        ):
 
-        self.dataframe_asistencia = None
-        self.dataframe_codigos = None
-        self.dataframe_velada = None
+            # ==========================================
+            # RUTAS USUARIO
+            # ==========================================
 
-    # =========================================================
-    # CARGA DE ARCHIVOS
-    # =========================================================
+            self.ruta_asistencia = Path(
+                ruta_asistencia
+            )
 
-    def cargar_archivos(self, ruta_asistencia, ruta_codigos):
+            self.ruta_guardado = Path(
+                ruta_guardado
+            )
+
+            # ==========================================
+            # RUTAS INTERNAS
+            # ==========================================
+
+            self.ruta_codigos = RUTA_CODIGOS
+
+            self.ruta_velada = RUTA_VELADA
+
+            # ==========================================
+            # DATAFRAMES
+            # ==========================================
+
+            self.dataframe_asistencia = None
+
+            self.dataframe_codigos = None
+
+            self.dataframe_velada = None
+
+        # =========================================================
+        # CARGA DE ARCHIVOS
+        # =========================================================
+
+    def cargar_archivos(self):
 
         try:
 
-            self._validar_archivos(ruta_asistencia, ruta_codigos)
+            self._validar_archivos()
 
-            self.dataframe_asistencia = pd.read_excel(ruta_asistencia)
+            # ==========================================
+            # ASISTENCIA
+            # ==========================================
 
-            self.dataframe_codigos = pd.read_excel(
-                ruta_codigos,
-                sheet_name="Hoja1"
+            self.dataframe_asistencia = pd.read_excel(
+                self.ruta_asistencia
             )
 
-            self.dataframe_velada = pd.read_excel(
-                ruta_codigos,
-                sheet_name="Personal de velada"
+            # ==========================================
+            # CODIGOS
+            # ==========================================
+
+            self.dataframe_codigos = pd.read_csv(
+                self.ruta_codigos
             )
 
+            # ==========================================
+            # VELADA
+            # ==========================================
+
+            self.dataframe_velada = pd.read_csv(
+                self.ruta_velada
+            )
             self._limpiar_columnas()
-
             return True
-
         except Exception as error:
             raise ErrorArchivo(str(error))
 
-    def _validar_archivos(self, ruta_asistencia, ruta_codigos):
+    def _validar_archivos(self):
 
-        ValidadorArchivos.validar_existencia_archivo(ruta_asistencia)
-        ValidadorArchivos.validar_existencia_archivo(ruta_codigos)
+        # ==========================================
+        # ASISTENCIA
+        # ==========================================
 
-        ValidadorArchivos.validar_extension_excel(ruta_asistencia)
-        ValidadorArchivos.validar_extension_excel(ruta_codigos)
+        ValidadorArchivos.validar_existencia_archivo(
+            self.ruta_asistencia
+        )
+
+        ValidadorArchivos.validar_extension_excel(
+            self.ruta_asistencia
+        )
+
+        # ==========================================
+        # ARCHIVOS INTERNOS
+        # ==========================================
+
+        ValidadorArchivos.validar_existencia_archivo(
+            self.ruta_codigos
+        )
+
+        ValidadorArchivos.validar_existencia_archivo(
+            self.ruta_velada
+        )
 
     def _limpiar_columnas(self):
 
@@ -485,13 +545,26 @@ class AsistenciaModel:
     # EXPORTAR
     # =========================================================
 
-    def exportar_excel(self, dataframe, ruta_salida):
+    def exportar_excel(
+        self,
+        dataframe,
+        nombre_archivo
+    ):
 
         try:
 
-            dataframe.to_excel(ruta_salida, index=False)
+            ruta_final = (
+                self.ruta_guardado
+                / nombre_archivo
+            )
+
+            dataframe.to_excel(
+                ruta_final,
+                index=False
+            )
 
         except Exception as error:
+
             raise ErrorProcesamiento(
                 f"No fue posible exportar el Excel:\n{error}"
             )
