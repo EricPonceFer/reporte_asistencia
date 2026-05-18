@@ -1,10 +1,10 @@
 from PyQt6.QtWidgets import QApplication
-from controlador.controlador_principal import Controlador
+from controlador.main_controller import MainController
 import sys
 
 app = QApplication(sys.argv)
 
-ventana = Controlador()
+ventana = MainController()
 ventana.show()
 
 sys.exit(app.exec())

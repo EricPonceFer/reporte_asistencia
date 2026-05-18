@@ -25,15 +25,20 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.Contenido = QtWidgets.QFrame(parent=self.centralwidget)
+        self.Contenido = QtWidgets.QStackedWidget(parent=self.centralwidget)
+        self.Contenido.setEnabled(True)
         self.Contenido.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.NoContextMenu)
+        self.Contenido.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
         self.Contenido.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.Contenido.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
-        self.Contenido.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
+        self.Contenido.setFrameShadow(QtWidgets.QFrame.Shadow.Plain)
+        self.Contenido.setMidLineWidth(-5)
         self.Contenido.setObjectName("Contenido")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.Contenido)
+        self.Reporte_Asistencia = QtWidgets.QWidget()
+        self.Reporte_Asistencia.setObjectName("Reporte_Asistencia")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.Reporte_Asistencia)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.fr_encabezado = QtWidgets.QFrame(parent=self.Contenido)
+        self.fr_encabezado = QtWidgets.QFrame(parent=self.Reporte_Asistencia)
         self.fr_encabezado.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
         self.fr_encabezado.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.fr_encabezado.setObjectName("fr_encabezado")
@@ -52,7 +57,7 @@ class Ui_MainWindow(object):
         self.label_7.setScaledContents(True)
         self.label_7.setObjectName("label_7")
         self.verticalLayout.addWidget(self.fr_encabezado)
-        self.fr_parametros = QtWidgets.QFrame(parent=self.Contenido)
+        self.fr_parametros = QtWidgets.QFrame(parent=self.Reporte_Asistencia)
         self.fr_parametros.setStyleSheet("\n"
 "background-color: rgb(240, 240, 240);\n"
 "")
@@ -134,7 +139,7 @@ class Ui_MainWindow(object):
         self.dt_comienzo.setCorrectionMode(QtWidgets.QAbstractSpinBox.CorrectionMode.CorrectToPreviousValue)
         self.dt_comienzo.setCalendarPopup(True)
         self.dt_comienzo.setTimeSpec(QtCore.Qt.TimeSpec.LocalTime)
-        self.dt_comienzo.setDate(QtCore.QDate(2026, 1, 1))
+        self.dt_comienzo.setDate(QtCore.QDate(2025, 12, 31))
         self.dt_comienzo.setObjectName("dt_comienzo")
         self.horizontalLayout_4.addWidget(self.dt_comienzo)
         self.verticalLayout_3.addWidget(self.frame_9)
@@ -366,6 +371,366 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.fr_parametros)
         self.verticalLayout.setStretch(0, 3)
         self.verticalLayout.setStretch(1, 10)
+        self.Contenido.addWidget(self.Reporte_Asistencia)
+        self.Codigo_Operadores = QtWidgets.QWidget()
+        self.Codigo_Operadores.setObjectName("Codigo_Operadores")
+        self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.Codigo_Operadores)
+        self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_4.setSpacing(0)
+        self.verticalLayout_4.setObjectName("verticalLayout_4")
+        self.fr_encabezado_2 = QtWidgets.QFrame(parent=self.Codigo_Operadores)
+        self.fr_encabezado_2.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.fr_encabezado_2.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
+        self.fr_encabezado_2.setObjectName("fr_encabezado_2")
+        self.label_8 = QtWidgets.QLabel(parent=self.fr_encabezado_2)
+        self.label_8.setGeometry(QtCore.QRect(420, 40, 381, 31))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(22)
+        font.setBold(True)
+        self.label_8.setFont(font)
+        self.label_8.setObjectName("label_8")
+        self.label_9 = QtWidgets.QLabel(parent=self.fr_encabezado_2)
+        self.label_9.setGeometry(QtCore.QRect(30, 10, 161, 81))
+        self.label_9.setText("")
+        self.label_9.setPixmap(QtGui.QPixmap(".\\ui\\../assets/logo-levapan.png"))
+        self.label_9.setScaledContents(True)
+        self.label_9.setObjectName("label_9")
+        self.verticalLayout_4.addWidget(self.fr_encabezado_2)
+        self.frame_10 = QtWidgets.QFrame(parent=self.Codigo_Operadores)
+        self.frame_10.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.frame_10.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
+        self.frame_10.setObjectName("frame_10")
+        self.horizontalLayout_6 = QtWidgets.QHBoxLayout(self.frame_10)
+        self.horizontalLayout_6.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_6.setSpacing(0)
+        self.horizontalLayout_6.setObjectName("horizontalLayout_6")
+        self.frame_12 = QtWidgets.QFrame(parent=self.frame_10)
+        self.frame_12.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.frame_12.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
+        self.frame_12.setObjectName("frame_12")
+        self.tb_operadores = QtWidgets.QTableView(parent=self.frame_12)
+        self.tb_operadores.setGeometry(QtCore.QRect(10, 10, 541, 321))
+        self.tb_operadores.setStyleSheet("background-color: rgb(197, 197, 197);")
+        self.tb_operadores.setObjectName("tb_operadores")
+        self.horizontalLayout_6.addWidget(self.frame_12)
+        self.frame_11 = QtWidgets.QFrame(parent=self.frame_10)
+        self.frame_11.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.frame_11.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
+        self.frame_11.setObjectName("frame_11")
+        self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.frame_11)
+        self.verticalLayout_5.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_5.setSpacing(0)
+        self.verticalLayout_5.setObjectName("verticalLayout_5")
+        self.frame_13 = QtWidgets.QFrame(parent=self.frame_11)
+        self.frame_13.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.frame_13.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
+        self.frame_13.setObjectName("frame_13")
+        self.buscar_archivo_2 = QtWidgets.QLineEdit(parent=self.frame_13)
+        self.buscar_archivo_2.setEnabled(True)
+        self.buscar_archivo_2.setGeometry(QtCore.QRect(30, 60, 231, 31))
+        self.buscar_archivo_2.setStyleSheet("QLineEdit{\n"
+"border: None;\n"
+"background-color:white;\n"
+"border-bottom: 2px solid blue;\n"
+"}")
+        self.buscar_archivo_2.setObjectName("buscar_archivo_2")
+        self.label_10 = QtWidgets.QLabel(parent=self.frame_13)
+        self.label_10.setGeometry(QtCore.QRect(20, 20, 211, 31))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(10)
+        font.setBold(True)
+        self.label_10.setFont(font)
+        self.label_10.setObjectName("label_10")
+        self.verticalLayout_5.addWidget(self.frame_13)
+        self.frame_14 = QtWidgets.QFrame(parent=self.frame_11)
+        self.frame_14.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.frame_14.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
+        self.frame_14.setObjectName("frame_14")
+        self.rb_Disponibles = QtWidgets.QRadioButton(parent=self.frame_14)
+        self.rb_Disponibles.setGeometry(QtCore.QRect(30, 20, 89, 20))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setBold(True)
+        self.rb_Disponibles.setFont(font)
+        self.rb_Disponibles.setObjectName("rb_Disponibles")
+        self.rb_NDisponibles = QtWidgets.QRadioButton(parent=self.frame_14)
+        self.rb_NDisponibles.setGeometry(QtCore.QRect(30, 60, 111, 20))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setBold(True)
+        self.rb_NDisponibles.setFont(font)
+        self.rb_NDisponibles.setObjectName("rb_NDisponibles")
+        self.btn_buscar_op = QtWidgets.QPushButton(parent=self.frame_14)
+        self.btn_buscar_op.setGeometry(QtCore.QRect(160, 20, 101, 41))
+        self.btn_buscar_op.setStyleSheet("QPushButton {\n"
+"    background-color: rgb(243, 156, 18);\n"
+"    color: black;\n"
+"    border: none;\n"
+"    border-radius: 10px;\n"
+"    padding: 10px;\n"
+"    font-weight: 600;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    background-color: rgb(211, 84, 0);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: rgb(186, 74, 0);\n"
+"}")
+        self.btn_buscar_op.setObjectName("btn_buscar_op")
+        self.verticalLayout_5.addWidget(self.frame_14)
+        self.frame_15 = QtWidgets.QFrame(parent=self.frame_11)
+        self.frame_15.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.frame_15.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
+        self.frame_15.setObjectName("frame_15")
+        self.btn_guardar_op = QtWidgets.QPushButton(parent=self.frame_15)
+        self.btn_guardar_op.setGeometry(QtCore.QRect(20, 30, 101, 41))
+        self.btn_guardar_op.setStyleSheet("QPushButton {\n"
+"    background-color: rgb(255, 247, 135);\n"
+"    color: rgb(40, 40, 40);\n"
+"    border: 1px solid rgb(210, 210, 120);\n"
+"    border-radius: 10px;\n"
+"    padding: 10px;\n"
+"    font-weight: 600;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    background-color: rgb(240, 230, 110);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: rgb(193, 193, 96);\n"
+"    padding-left: 11px;\n"
+"    padding-top: 11px;\n"
+"}")
+        self.btn_guardar_op.setObjectName("btn_guardar_op")
+        self.btn_recargar = QtWidgets.QPushButton(parent=self.frame_15)
+        self.btn_recargar.setGeometry(QtCore.QRect(160, 30, 101, 41))
+        self.btn_recargar.setStyleSheet("QPushButton#btn_recargar {\n"
+"    background-color: #3498db;\n"
+"    color: black;\n"
+"    border: none;\n"
+"    border-radius: 10px;\n"
+"    padding: 10px;\n"
+"    font-weight: 600;\n"
+"}\n"
+"\n"
+"QPushButton#btn_recargar:hover {\n"
+"    background-color: #2e86c1;\n"
+"}\n"
+"\n"
+"QPushButton#btn_recargar:pressed {\n"
+"    background-color: #21618c;\n"
+"}")
+        self.btn_recargar.setObjectName("btn_recargar")
+        self.verticalLayout_5.addWidget(self.frame_15)
+        self.horizontalLayout_6.addWidget(self.frame_11)
+        self.horizontalLayout_6.setStretch(0, 2)
+        self.horizontalLayout_6.setStretch(1, 1)
+        self.verticalLayout_4.addWidget(self.frame_10)
+        self.verticalLayout_4.setStretch(0, 1)
+        self.verticalLayout_4.setStretch(1, 3)
+        self.Contenido.addWidget(self.Codigo_Operadores)
+        self.Personal_Velada = QtWidgets.QWidget()
+        self.Personal_Velada.setObjectName("Personal_Velada")
+        self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.Personal_Velada)
+        self.verticalLayout_6.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_6.setSpacing(0)
+        self.verticalLayout_6.setObjectName("verticalLayout_6")
+        self.fr_encabezado_3 = QtWidgets.QFrame(parent=self.Personal_Velada)
+        self.fr_encabezado_3.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.fr_encabezado_3.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
+        self.fr_encabezado_3.setObjectName("fr_encabezado_3")
+        self.label_11 = QtWidgets.QLabel(parent=self.fr_encabezado_3)
+        self.label_11.setGeometry(QtCore.QRect(420, 40, 381, 31))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(22)
+        font.setBold(True)
+        self.label_11.setFont(font)
+        self.label_11.setObjectName("label_11")
+        self.label_12 = QtWidgets.QLabel(parent=self.fr_encabezado_3)
+        self.label_12.setGeometry(QtCore.QRect(30, 10, 161, 81))
+        self.label_12.setText("")
+        self.label_12.setPixmap(QtGui.QPixmap(".\\ui\\../assets/logo-levapan.png"))
+        self.label_12.setScaledContents(True)
+        self.label_12.setObjectName("label_12")
+        self.verticalLayout_6.addWidget(self.fr_encabezado_3)
+        self.frame_16 = QtWidgets.QFrame(parent=self.Personal_Velada)
+        self.frame_16.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.frame_16.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
+        self.frame_16.setObjectName("frame_16")
+        self.horizontalLayout_7 = QtWidgets.QHBoxLayout(self.frame_16)
+        self.horizontalLayout_7.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_7.setSpacing(0)
+        self.horizontalLayout_7.setObjectName("horizontalLayout_7")
+        self.frame_17 = QtWidgets.QFrame(parent=self.frame_16)
+        self.frame_17.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.frame_17.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
+        self.frame_17.setObjectName("frame_17")
+        self.tb_velada = QtWidgets.QTableView(parent=self.frame_17)
+        self.tb_velada.setGeometry(QtCore.QRect(10, 10, 541, 321))
+        self.tb_velada.setStyleSheet("background-color: rgb(170, 255, 255);")
+        self.tb_velada.setObjectName("tb_velada")
+        self.horizontalLayout_7.addWidget(self.frame_17)
+        self.frame_18 = QtWidgets.QFrame(parent=self.frame_16)
+        self.frame_18.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.frame_18.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
+        self.frame_18.setObjectName("frame_18")
+        self.verticalLayout_7 = QtWidgets.QVBoxLayout(self.frame_18)
+        self.verticalLayout_7.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_7.setSpacing(0)
+        self.verticalLayout_7.setObjectName("verticalLayout_7")
+        self.frame_19 = QtWidgets.QFrame(parent=self.frame_18)
+        self.frame_19.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.frame_19.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
+        self.frame_19.setObjectName("frame_19")
+        self.label_15 = QtWidgets.QLabel(parent=self.frame_19)
+        self.label_15.setGeometry(QtCore.QRect(20, 20, 211, 31))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(10)
+        font.setBold(True)
+        self.label_15.setFont(font)
+        self.label_15.setObjectName("label_15")
+        self.buscar_archivo_vl = QtWidgets.QLineEdit(parent=self.frame_19)
+        self.buscar_archivo_vl.setEnabled(True)
+        self.buscar_archivo_vl.setGeometry(QtCore.QRect(30, 60, 231, 31))
+        self.buscar_archivo_vl.setStyleSheet("QLineEdit{\n"
+"border: None;\n"
+"background-color:white;\n"
+"border-bottom: 2px solid blue;\n"
+"}")
+        self.buscar_archivo_vl.setObjectName("buscar_archivo_vl")
+        self.verticalLayout_7.addWidget(self.frame_19)
+        self.frame_20 = QtWidgets.QFrame(parent=self.frame_18)
+        self.frame_20.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.frame_20.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
+        self.frame_20.setObjectName("frame_20")
+        self.dt_velada_fecha = QtWidgets.QDateEdit(parent=self.frame_20)
+        self.dt_velada_fecha.setGeometry(QtCore.QRect(30, 60, 110, 22))
+        self.dt_velada_fecha.setStyleSheet("QDateEdit {\n"
+"    background-color: #2b2b2b;\n"
+"    color: white;\n"
+"    border: 1px solid #444;\n"
+"    padding: 5px;\n"
+"}\n"
+"\n"
+"\n"
+"/* Mes y año */\n"
+"QCalendarWidget QToolButton {\n"
+"    color: black;\n"
+"    background-color: white;\n"
+"    font-size: 12px;\n"
+"    font-weight: bold;\n"
+"    border: none;\n"
+"}\n"
+"\n"
+"\n"
+"/* Días */\n"
+"QCalendarWidget QSpinBox {\n"
+"    color: black;\n"
+"    background: white;\n"
+"    selection-background-color: #2ecc71;\n"
+"    selection-color: white;\n"
+"}\n"
+"/* Selección */\n"
+"QCalendarWidget QAbstractItemView:enabled {\n"
+"    color: black;\n"
+"    background-color: white;\n"
+"    selection-background-color: #2ecc71;\n"
+"    selection-color: white;\n"
+"}\n"
+"")
+        self.dt_velada_fecha.setWrapping(False)
+        self.dt_velada_fecha.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.UpDownArrows)
+        self.dt_velada_fecha.setKeyboardTracking(True)
+        self.dt_velada_fecha.setDateTime(QtCore.QDateTime(QtCore.QDate(2026, 1, 1), QtCore.QTime(5, 0, 0)))
+        self.dt_velada_fecha.setCalendarPopup(True)
+        self.dt_velada_fecha.setObjectName("dt_velada_fecha")
+        self.label_16 = QtWidgets.QLabel(parent=self.frame_20)
+        self.label_16.setGeometry(QtCore.QRect(20, 20, 141, 31))
+        font = QtGui.QFont()
+        font.setFamily("Poppins")
+        font.setPointSize(10)
+        font.setBold(True)
+        self.label_16.setFont(font)
+        self.label_16.setObjectName("label_16")
+        self.btn_buscar_vl = QtWidgets.QPushButton(parent=self.frame_20)
+        self.btn_buscar_vl.setGeometry(QtCore.QRect(160, 50, 101, 41))
+        self.btn_buscar_vl.setStyleSheet("QPushButton {\n"
+"    background-color: rgb(243, 156, 18);\n"
+"    color: black;\n"
+"    border: none;\n"
+"    border-radius: 10px;\n"
+"    padding: 10px;\n"
+"    font-weight: 600;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    background-color: rgb(211, 84, 0);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: rgb(186, 74, 0);\n"
+"}")
+        self.btn_buscar_vl.setObjectName("btn_buscar_vl")
+        self.verticalLayout_7.addWidget(self.frame_20)
+        self.frame_21 = QtWidgets.QFrame(parent=self.frame_18)
+        self.frame_21.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.frame_21.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
+        self.frame_21.setObjectName("frame_21")
+        self.btn_eliminar = QtWidgets.QPushButton(parent=self.frame_21)
+        self.btn_eliminar.setGeometry(QtCore.QRect(160, 30, 101, 41))
+        self.btn_eliminar.setStyleSheet("QPushButton#btn_eliminar {\n"
+"    background-color: #e74c3c;\n"
+"    color: black;\n"
+"    border: none;\n"
+"    border-radius: 10px;\n"
+"    padding: 10px;\n"
+"    font-weight: 600;\n"
+"}\n"
+"\n"
+"QPushButton#btn_eliminar:hover {\n"
+"    background-color: #cb4335;\n"
+"}\n"
+"\n"
+"QPushButton#btn_eliminar:pressed {\n"
+"    background-color: #a93226;\n"
+"}")
+        self.btn_eliminar.setObjectName("btn_eliminar")
+        self.btn_guardar_vl = QtWidgets.QPushButton(parent=self.frame_21)
+        self.btn_guardar_vl.setGeometry(QtCore.QRect(20, 30, 101, 41))
+        self.btn_guardar_vl.setStyleSheet("QPushButton {\n"
+"    background-color: rgb(255, 247, 135);\n"
+"    color: rgb(40, 40, 40);\n"
+"    border: 1px solid rgb(210, 210, 120);\n"
+"    border-radius: 10px;\n"
+"    padding: 10px;\n"
+"    font-weight: 600;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    background-color: rgb(240, 230, 110);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: rgb(193, 193, 96);\n"
+"    padding-left: 11px;\n"
+"    padding-top: 11px;\n"
+"}")
+        self.btn_guardar_vl.setObjectName("btn_guardar_vl")
+        self.verticalLayout_7.addWidget(self.frame_21)
+        self.horizontalLayout_7.addWidget(self.frame_18)
+        self.horizontalLayout_7.setStretch(0, 2)
+        self.horizontalLayout_7.setStretch(1, 1)
+        self.verticalLayout_6.addWidget(self.frame_16)
+        self.verticalLayout_6.setStretch(0, 1)
+        self.verticalLayout_6.setStretch(1, 3)
+        self.Contenido.addWidget(self.Personal_Velada)
         self.horizontalLayout.addWidget(self.Contenido)
         self.Menu = QtWidgets.QFrame(parent=self.centralwidget)
         self.Menu.setStyleSheet("background-color: rgb(255, 0, 0);\n"
@@ -428,6 +793,34 @@ class Ui_MainWindow(object):
         self.btn_pltOperador.setIcon(icon2)
         self.btn_pltOperador.setIconSize(QtCore.QSize(35, 35))
         self.btn_pltOperador.setObjectName("btn_pltOperador")
+        self.btn_pltVelada = QtWidgets.QPushButton(parent=self.Menu)
+        self.btn_pltVelada.setEnabled(True)
+        self.btn_pltVelada.setGeometry(QtCore.QRect(0, 120, 58, 54))
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Ignored, QtWidgets.QSizePolicy.Policy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.btn_pltVelada.sizePolicy().hasHeightForWidth())
+        self.btn_pltVelada.setSizePolicy(sizePolicy)
+        self.btn_pltVelada.setStyleSheet("QPushButton {\n"
+"    padding: 10px;\n"
+"    color: white;\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(255, 255, 255, 120);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(255, 255, 255, 120);\n"
+"}")
+        self.btn_pltVelada.setText("")
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap(".\\ui\\../assets/horarios.svg"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        self.btn_pltVelada.setIcon(icon3)
+        self.btn_pltVelada.setIconSize(QtCore.QSize(35, 35))
+        self.btn_pltVelada.setObjectName("btn_pltVelada")
         self.horizontalLayout.addWidget(self.Menu)
         self.horizontalLayout.setStretch(0, 15)
         self.horizontalLayout.setStretch(1, 1)
@@ -441,6 +834,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
+        self.Contenido.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -454,3 +848,26 @@ class Ui_MainWindow(object):
         self.label_6.setText(_translate("MainWindow", "Nombre:"))
         self.btn_crear.setText(_translate("MainWindow", "CREAR"))
         self.btn_limpiar.setText(_translate("MainWindow", "LIMPIAR"))
+        self.label_8.setText(_translate("MainWindow", "CÓDIGO DEL PERSONAL"))
+        self.label_10.setText(_translate("MainWindow", "Nombre/Codigo Operador:"))
+        self.rb_Disponibles.setText(_translate("MainWindow", "Disponibles"))
+        self.rb_NDisponibles.setText(_translate("MainWindow", "No Disponibles"))
+        self.btn_buscar_op.setText(_translate("MainWindow", "BUSCAR"))
+        self.btn_guardar_op.setText(_translate("MainWindow", "GUARDAR"))
+        self.btn_recargar.setText(_translate("MainWindow", "RECARGAR"))
+        self.label_11.setText(_translate("MainWindow", "PERSONAL DE VELADA"))
+        self.label_15.setText(_translate("MainWindow", "Nombre/Codigo Operador:"))
+        self.label_16.setText(_translate("MainWindow", "Fecha de Busqueda:"))
+        self.btn_buscar_vl.setText(_translate("MainWindow", "BUSCAR"))
+        self.btn_eliminar.setText(_translate("MainWindow", "RECARGAR"))
+        self.btn_guardar_vl.setText(_translate("MainWindow", "GUARDAR"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec())

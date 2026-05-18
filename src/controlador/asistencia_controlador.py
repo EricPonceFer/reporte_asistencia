@@ -1,25 +1,31 @@
-from vista.interfaz_reporte import Ui_MainWindow
 from PyQt6.QtWidgets import (
-    QMainWindow,
     QFileDialog,
     QMessageBox
 )
 from modelo.asistencia_model import AsistenciaModel
 from PyQt6 import QtCore
 
-class Controlador(QMainWindow):
+class Controlador_Reporte_Asitencia:
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, window, ui):
+
+        # ==========================================
+        # RECIBIR UI DEL MAIN
+        # ==========================================
+
+        self.ui = ui
+        self.window = window
+
         self.modelo = None
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
 
         # Variables
         self.ruta_excel = ""
         self.ruta_guardado = ""
 
-        # Eventos
+        # ==========================================
+        # EVENTOS
+        # ==========================================
+
         self.ui.btn_buscar.clicked.connect(
             self.cargar_excel
         )
@@ -45,7 +51,7 @@ class Controlador(QMainWindow):
         try:
 
             ruta, _ = QFileDialog.getOpenFileName(
-                self,
+                self.window,
                 "Seleccionar Excel",
                 "",
                 "Archivos Excel (*.xlsx *.xls)"
@@ -55,7 +61,7 @@ class Controlador(QMainWindow):
             if not ruta:
 
                 QMessageBox.warning(
-                    self,
+                    self.window,
                     "Archivo no seleccionado",
                     "No seleccionó ningún archivo Excel."
                 )
@@ -69,7 +75,7 @@ class Controlador(QMainWindow):
             )
 
             QMessageBox.information(
-                self,
+                self.window,
                 "Archivo cargado",
                 "El archivo Excel fue seleccionado correctamente."
             )
@@ -77,7 +83,7 @@ class Controlador(QMainWindow):
         except Exception as error:
 
             QMessageBox.critical(
-                self,
+                self.window,
                 "Error",
                 f"Ocurrió un error al cargar el archivo:\\n{error}"
             )
@@ -91,7 +97,7 @@ class Controlador(QMainWindow):
         try:
 
             ruta = QFileDialog.getExistingDirectory(
-                self,
+                self.window,
                 "Seleccionar carpeta"
             )
 
@@ -99,7 +105,7 @@ class Controlador(QMainWindow):
             if not ruta:
 
                 QMessageBox.warning(
-                    self,
+                    self.window,
                     "Carpeta no seleccionada",
                     "No seleccionó ninguna carpeta."
                 )
@@ -116,7 +122,7 @@ class Controlador(QMainWindow):
         except Exception as error:
 
             QMessageBox.critical(
-                self,
+                self.window,
                 "Error",
                 f"Ocurrió un error al seleccionar la carpeta:\\n{error}"
             )
@@ -135,7 +141,7 @@ class Controlador(QMainWindow):
             if not self.ui.buscar_archivo.text().strip():
 
                 QMessageBox.warning(
-                    self,
+                    self.window,
                     "Archivo faltante",
                     "Debe seleccionar un archivo Excel."
                 )
@@ -149,7 +155,7 @@ class Controlador(QMainWindow):
             if not self.ui.guardar_archivo.text().strip():
 
                 QMessageBox.warning(
-                    self,
+                    self.window,
                     "Carpeta faltante",
                     "Debe seleccionar una carpeta de guardado."
                 )
@@ -167,7 +173,7 @@ class Controlador(QMainWindow):
             if not nombre_archivo:
 
                 QMessageBox.warning(
-                    self,
+                    self.window,
                     "Nombre faltante",
                     "Debe ingresar un nombre para el archivo."
                 )
@@ -190,7 +196,7 @@ class Controlador(QMainWindow):
             if fecha_inicio > fecha_final:
 
                 QMessageBox.warning(
-                    self,
+                    self.window,
                     "Fechas inválidas",
                     "La fecha de inicio no puede ser mayor a la fecha final."
                 )
@@ -201,7 +207,7 @@ class Controlador(QMainWindow):
             if fecha_inicio.year != 2026:
 
                 QMessageBox.warning(
-                    self,
+                    self.window,
                     "Fecha inválida",
                     "La fecha de inicio debe pertenecer al año 2026."
                 )
@@ -211,7 +217,7 @@ class Controlador(QMainWindow):
             if fecha_final.year != 2026:
 
                 QMessageBox.warning(
-                    self,
+                    self.window,
                     "Fecha inválida",
                     "La fecha final debe pertenecer al año 2026."
                 )
@@ -255,7 +261,7 @@ class Controlador(QMainWindow):
             # ==========================================
 
             QMessageBox.information(
-                self,
+                self.window,
                 "Proceso completado",
                 "El reporte fue generado correctamente."
             )
@@ -263,7 +269,7 @@ class Controlador(QMainWindow):
         except Exception as error:
 
             QMessageBox.critical(
-                self,
+                self.window,
                 "Error",
                 f"Ocurrió un error durante el proceso:\\n{error}"
             )
@@ -317,7 +323,7 @@ class Controlador(QMainWindow):
             # ==========================================
 
             QMessageBox.information(
-                self,
+                self.window,
                 "Campos limpiados",
                 "Todos los campos fueron restablecidos correctamente."
             )
@@ -325,7 +331,7 @@ class Controlador(QMainWindow):
         except Exception as error:
 
             QMessageBox.critical(
-                self,
+                self.window,
                 "Error",
                 f"Ocurrió un error al limpiar los campos:\\n{error}"
             )
