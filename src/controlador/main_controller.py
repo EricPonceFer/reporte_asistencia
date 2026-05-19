@@ -2,9 +2,9 @@ from vista.interfaz_reporte import Ui_MainWindow
 
 from PyQt6.QtWidgets import QMainWindow
 
-from controlador.asistencia_controlador import (
-    Controlador_Reporte_Asitencia
-)
+from controlador.asistencia_controlador import Controlador_Reporte_Asitencia
+from controlador.operadores_controlador import Controlador_Operadores
+from controlador.velada_controlador import Controlador_Velada
 
 class MainController(QMainWindow):
 
@@ -20,6 +20,12 @@ class MainController(QMainWindow):
 
         self.asistencia_controller = (
             Controlador_Reporte_Asitencia(self, self.ui)
+        )
+        self.operador_controller = (
+            Controlador_Operadores(self, self.ui)
+        )
+        self.velada_controller = (
+            Controlador_Velada(self, self.ui)
         )
         # ==========================================
         # LISTA BOTONES MENU

@@ -35,8 +35,9 @@ class CSVModel:
             # ==========================================
             # VALIDAR EXTENSION
             # ==========================================
+            ruta = str(ruta_archivo)
 
-            if not ruta_archivo.lower().endswith(".csv"):
+            if not ruta.endswith(".csv"):
 
                 raise ValueError(
                     "El archivo debe tener extensión CSV."
@@ -63,7 +64,7 @@ class CSVModel:
                 raise ValueError(
                     "El archivo CSV está vacío."
                 )
-
+            
             return self.dataframe
 
         except FileNotFoundError as error:

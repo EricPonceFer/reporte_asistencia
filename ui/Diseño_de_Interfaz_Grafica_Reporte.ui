@@ -78,7 +78,7 @@
        <number>-5</number>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="Reporte_Asistencia">
        <layout class="QVBoxLayout" name="verticalLayout" stretch="3,10">
@@ -839,7 +839,114 @@ QPushButton:pressed {
                </rect>
               </property>
               <property name="styleSheet">
-               <string notr="true">background-color: rgb(197, 197, 197);</string>
+               <string notr="true">QTableView {
+
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+
+    gridline-color: #e6e6e6;
+
+    font-size: 12px;
+    color: #2b2b2b;
+
+    selection-background-color: #2563eb;
+    selection-color: white;
+
+    alternate-background-color: #f8fafc;
+}
+
+/* ENCABEZADOS */
+
+QHeaderView::section {
+
+    background-color: #1e293b;
+    color: white;
+
+    padding: 8px;
+
+    border: none;
+
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* FILAS */
+
+QTableView::item {
+
+    padding: 6px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* HOVER */
+
+QTableView::item:hover {
+
+    background-color: #dbeafe;
+    color: black;
+}
+
+/* CELDA SELECCIONADA */
+
+QTableView::item:selected {
+
+    background-color: #2563eb;
+    color: white;
+}
+
+/* SCROLLBAR VERTICAL */
+
+QScrollBar:vertical {
+
+    background: #f1f5f9;
+    width: 12px;
+    margin: 0px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:vertical {
+
+    background: #94a3b8;
+    min-height: 25px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:vertical:hover {
+
+    background: #64748b;
+}
+
+/* SCROLLBAR HORIZONTAL */
+
+QScrollBar:horizontal {
+
+    background: #f1f5f9;
+    height: 12px;
+    margin: 0px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:horizontal {
+
+    background: #94a3b8;
+    min-width: 25px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:horizontal:hover {
+
+    background: #64748b;
+}
+
+/* OCULTAR BOTONES */
+
+QScrollBar::add-line,
+QScrollBar::sub-line {
+
+    border: none;
+    background: none;
+}</string>
               </property>
              </widget>
             </widget>
@@ -1187,7 +1294,114 @@ QPushButton#btn_recargar:pressed {
                </rect>
               </property>
               <property name="styleSheet">
-               <string notr="true">background-color: rgb(170, 255, 255);</string>
+               <string notr="true">QTableView {
+
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+
+    gridline-color: #e6e6e6;
+
+    font-size: 12px;
+    color: #2b2b2b;
+
+    selection-background-color: #2563eb;
+    selection-color: white;
+
+    alternate-background-color: #f8fafc;
+}
+
+/* ENCABEZADOS */
+
+QHeaderView::section {
+
+    background-color: #1e293b;
+    color: white;
+
+    padding: 8px;
+
+    border: none;
+
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* FILAS */
+
+QTableView::item {
+
+    padding: 6px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* HOVER */
+
+QTableView::item:hover {
+
+    background-color: #dbeafe;
+    color: black;
+}
+
+/* CELDA SELECCIONADA */
+
+QTableView::item:selected {
+
+    background-color: #2563eb;
+    color: white;
+}
+
+/* SCROLLBAR VERTICAL */
+
+QScrollBar:vertical {
+
+    background: #f1f5f9;
+    width: 12px;
+    margin: 0px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:vertical {
+
+    background: #94a3b8;
+    min-height: 25px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:vertical:hover {
+
+    background: #64748b;
+}
+
+/* SCROLLBAR HORIZONTAL */
+
+QScrollBar:horizontal {
+
+    background: #f1f5f9;
+    height: 12px;
+    margin: 0px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:horizontal {
+
+    background: #94a3b8;
+    min-width: 25px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:horizontal:hover {
+
+    background: #64748b;
+}
+
+/* OCULTAR BOTONES */
+
+QScrollBar::add-line,
+QScrollBar::sub-line {
+
+    border: none;
+    background: none;
+}</string>
               </property>
              </widget>
             </widget>
@@ -1280,7 +1494,7 @@ border-bottom: 2px solid blue;
                    <x>30</x>
                    <y>60</y>
                    <width>110</width>
-                   <height>22</height>
+                   <height>31</height>
                   </rect>
                  </property>
                  <property name="styleSheet">
@@ -1329,7 +1543,7 @@ QCalendarWidget QAbstractItemView:enabled {
                  </property>
                  <property name="dateTime">
                   <datetime>
-                   <hour>5</hour>
+                   <hour>10</hour>
                    <minute>0</minute>
                    <second>0</second>
                    <year>2026</year>

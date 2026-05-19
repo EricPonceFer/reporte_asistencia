@@ -1,337 +1,427 @@
 from PyQt6.QtWidgets import (
-    QFileDialog,
-    QMessageBox
+    QMessageBox,
+    QInputDialog
 )
-from modelo.asistencia_model import AsistenciaModel
-from PyQt6 import QtCore
 
-class Controlador_Reporte_Asitencia:
+from PyQt6.QtCore import Qt
+
+from modelo.dataframe_model import CSVModel
+from modelo.table_dataframe_model import DataFrameModel
+
+from config.config import (
+    RUTA_CODIGOS
+)
+
+
+class Controlador_Operadores:
 
     def __init__(self, window, ui):
 
         # ==========================================
-        # RECIBIR UI DEL MAIN
+        # RECIBIR UI
         # ==========================================
 
         self.ui = ui
         self.window = window
 
-        self.modelo = None
+        # ==========================================
+        # MODELOS
+        # ==========================================
 
-        # Variables
-        self.ruta_excel = ""
-        self.ruta_guardado = ""
+        self.modelo = CSVModel()
+
+        self.df = None
+        self.df_original = None
+
+        self.modelo_tabla = None
+
+        # ==========================================
+        # CONTROL DE CAMBIOS
+        # ==========================================
+
+        self.cambios = {
+            "editar": {},
+            "crear": []
+        }
 
         # ==========================================
         # EVENTOS
         # ==========================================
 
-        self.ui.btn_buscar.clicked.connect(
-            self.cargar_excel
+        self.ui.btn_buscar_op.clicked.connect(
+            self.filtrar_operadores
         )
 
-        self.ui.btn_guardar.clicked.connect(
-            self.seleccionar_carpeta
+        self.ui.btn_guardar_op.clicked.connect(
+            self.guardar_cambios
         )
 
-        self.ui.btn_crear.clicked.connect(
-            self.crear_reporte
+        self.ui.btn_recargar.clicked.connect(
+            self.recargar_datos
         )
 
-        self.ui.btn_limpiar.clicked.connect(
-            self.limpiar_campos
+        # ==========================================
+        # CARGAR TABLA
+        # ==========================================
+
+        self.cargar_tabla_operadores()
+
+    # ==================================================
+    # MENSAJES
+    # ==================================================
+
+    def mostrar_error(self, titulo, mensaje):
+
+        QMessageBox.critical(
+            self.window,
+            titulo,
+            mensaje
         )
 
-    # =====================================================
-    # CARGAR EXCEL
-    # =====================================================
+    def mostrar_info(self, titulo, mensaje):
 
-    def cargar_excel(self):
+        QMessageBox.information(
+            self.window,
+            titulo,
+            mensaje
+        )
+
+    # ==================================================
+    # CARGAR TABLA
+    # ==================================================
+
+    def cargar_tabla_operadores(self):
 
         try:
 
-            ruta, _ = QFileDialog.getOpenFileName(
-                self.window,
-                "Seleccionar Excel",
-                "",
-                "Archivos Excel (*.xlsx *.xls)"
-            )
+            self.df = self.modelo.cargar_csv(RUTA_CODIGOS)
 
-            # Usuario canceló
-            if not ruta:
+            if self.df.empty:
 
-                QMessageBox.warning(
-                    self.window,
-                    "Archivo no seleccionado",
-                    "No seleccionó ningún archivo Excel."
+                self.mostrar_error(
+                    "Archivo vacío",
+                    "El archivo no contiene datos."
                 )
 
                 return
 
-            self.ruta_excel = ruta
+            # COPIA ORIGINAL
 
-            self.ui.buscar_archivo.setText(
-                ruta
+            self.df_original = self.df.copy()
+            self.df = self.df.drop(columns="Cantidad")
+            # MODELO TABLA
+
+            self.modelo_tabla = DataFrameModel(self.df)
+
+            # CARGAR TABLA
+
+            self.ui.tb_operadores.setModel(
+                self.modelo_tabla
             )
 
-            QMessageBox.information(
-                self.window,
-                "Archivo cargado",
-                "El archivo Excel fue seleccionado correctamente."
+            # AJUSTAR
+
+            self.ui.tb_operadores.resizeColumnsToContents()
+
+            # EVENTO EDICION
+
+            self.modelo_tabla.dataChanged.connect(
+                self.registrar_edicion
             )
 
-        except Exception as error:
+        except Exception as e:
 
-            QMessageBox.critical(
-                self.window,
+            self.mostrar_error(
                 "Error",
-                f"Ocurrió un error al cargar el archivo:\\n{error}"
+                str(e)
             )
 
-    # =====================================================
-    # SELECCIONAR CARPETA
-    # =====================================================
+    # ==================================================
+    # FILTRAR
+    # ==================================================
 
-    def seleccionar_carpeta(self):
+    def filtrar_operadores(self):
 
         try:
 
-            ruta = QFileDialog.getExistingDirectory(
-                self.window,
-                "Seleccionar carpeta"
+            texto = (
+                self.ui.buscar_archivo_2.text()
+                .strip()
+                .lower()
             )
 
-            # Usuario canceló
-            if not ruta:
+            # ==========================================
+            # SIN TEXTO
+            # ==========================================
 
-                QMessageBox.warning(
-                    self.window,
-                    "Carpeta no seleccionada",
-                    "No seleccionó ninguna carpeta."
+            if not texto:
+
+                self.df = self.df_original.copy()
+
+            else:
+
+                # ==========================================
+                # FILTRAR SOLO POR:
+                # CODIGO Y NOMBRES
+                # ==========================================
+
+                filtro = (
+
+                    self.df_original["CODIGO"]
+                    .astype(str)
+                    .str.lower()
+                    .str.contains(texto, na=False)
+
+                ) | (
+
+                    self.df_original["NOMBRES"]
+                    .astype(str)
+                    .str.lower()
+                    .str.contains(texto, na=False)
+
+                )
+
+                self.df = self.df_original[
+                    filtro
+                ].copy()
+
+            # ==========================================
+            # RECARGAR TABLA
+            # ==========================================
+
+            self.modelo_tabla._df = self.df
+            self.modelo_tabla.layoutChanged.emit()
+
+        except KeyError as e:
+
+            self.mostrar_error(
+                "Columna no encontrada",
+                f"No existe la columna:\n{str(e)}"
+            )
+
+        except Exception as e:
+
+            self.mostrar_error(
+                "Error al buscar",
+                str(e)
+            )
+
+    # ==================================================
+    # REGISTRAR EDICION
+    # ==================================================
+
+    def registrar_edicion(self):
+
+        try:
+
+            for fila in range(len(self.df)):
+
+                id_operador = str(
+                    self.df.iloc[fila, 0]
+                )
+
+                self.cambios["editar"][id_operador] = (
+                    self.df.iloc[fila].to_dict()
+                )
+
+        except Exception as e:
+
+            self.mostrar_error(
+                "Error al editar",
+                str(e)
+            )
+
+    # ==================================================
+    # ELIMINAR FILA
+    # ==================================================
+
+    def eliminar_fila(self):
+
+        try:
+
+            index = self.ui.tb_operadores.currentIndex()
+
+            if not index.isValid():
+
+                self.mostrar_error(
+                    "Selección requerida",
+                    "Seleccione una fila."
                 )
 
                 return
 
-            self.ruta_guardado = ruta
+            fila = index.row()
 
-            self.ui.guardar_archivo.setText(
-                ruta
+            id_operador = str(
+                self.df.iloc[fila, 0]
             )
-            
 
-        except Exception as error:
+            # REGISTRAR ELIMINACION
 
-            QMessageBox.critical(
-                self.window,
-                "Error",
-                f"Ocurrió un error al seleccionar la carpeta:\\n{error}"
+            self.cambios["eliminar"].append(
+                id_operador
             )
-    # =====================================================
-    # CREAR REPORTE
-    # =====================================================
 
-    def crear_reporte(self):
+            # ELIMINAR
+
+            self.df.drop(
+                index=self.df.index[fila],
+                inplace=True
+            )
+
+            self.df.reset_index(
+                drop=True,
+                inplace=True
+            )
+
+            # ACTUALIZAR TABLA
+
+            self.modelo_tabla._df = self.df
+            self.modelo_tabla.layoutChanged.emit()
+
+            self.mostrar_info(
+                "Fila eliminada",
+                "Registro eliminado correctamente."
+            )
+
+        except Exception as e:
+
+            self.mostrar_error(
+                "Error al eliminar",
+                str(e)
+            )
+
+    # ==================================================
+    # CREAR FILA
+    # ==================================================
+
+    def crear_fila(self):
+
+        try:
+
+            nueva_fila = {}
+
+            # PEDIR DATOS
+
+            for columna in self.df.columns:
+
+                valor, ok = QInputDialog.getText(
+                    self.window,
+                    "Nuevo registro",
+                    f"Ingrese {columna}:"
+                )
+
+                if not ok:
+                    return
+
+                nueva_fila[columna] = valor
+
+            # AGREGAR
+
+            self.df.loc[len(self.df)] = nueva_fila
+
+            # REGISTRAR
+
+            self.cambios["crear"].append(
+                nueva_fila
+            )
+
+            # ACTUALIZAR
+
+            self.modelo_tabla._df = self.df
+            self.modelo_tabla.layoutChanged.emit()
+
+            self.mostrar_info(
+                "Registro creado",
+                "Nuevo registro agregado."
+            )
+
+        except Exception as e:
+
+            self.mostrar_error(
+                "Error al crear",
+                str(e)
+            )
+
+    # ==================================================
+    # GUARDAR CAMBIOS
+    # ==================================================
+
+    def guardar_cambios(self):
 
         try:
 
             # ==========================================
-            # VALIDAR ARCHIVO
+            # GUARDAR CSV
             # ==========================================
 
-            if not self.ui.buscar_archivo.text().strip():
-
-                QMessageBox.warning(
-                    self.window,
-                    "Archivo faltante",
-                    "Debe seleccionar un archivo Excel."
-                )
-
-                return
-
-            # ==========================================
-            # VALIDAR CARPETA
-            # ==========================================
-
-            if not self.ui.guardar_archivo.text().strip():
-
-                QMessageBox.warning(
-                    self.window,
-                    "Carpeta faltante",
-                    "Debe seleccionar una carpeta de guardado."
-                )
-
-                return
-
-            # ==========================================
-            # VALIDAR NOMBRE ARCHIVO
-            # ==========================================
-
-            nombre_archivo = (
-                self.ui.nombre_archivo.text().strip()
+            self.df.to_csv(
+                RUTA_CODIGOS,
+                index=False
             )
 
-            if not nombre_archivo:
-
-                QMessageBox.warning(
-                    self.window,
-                    "Nombre faltante",
-                    "Debe ingresar un nombre para el archivo."
-                )
-
-                return
-
             # ==========================================
-            # VALIDAR FECHAS
+            # MOSTRAR CAMBIOS
             # ==========================================
 
-            fecha_inicio = (
-                self.ui.dt_comienzo.date().toPyDate()
+            resumen = (
+                f"Editados: "
+                f"{len(self.cambios['editar'])}\n"
+                f"Creados: "
+                f"{len(self.cambios['crear'])}\n"
+                f"Eliminados: "
+                f"{len(self.cambios['eliminar'])}"
             )
 
-            fecha_final = (
-                self.ui.dt_final.date().toPyDate()
+            self.mostrar_info(
+                "Cambios guardados",
+                resumen
             )
 
-            # Fecha inicio mayor
-            if fecha_inicio > fecha_final:
+            # LIMPIAR CONTROL
 
-                QMessageBox.warning(
-                    self.window,
-                    "Fechas inválidas",
-                    "La fecha de inicio no puede ser mayor a la fecha final."
-                )
+            self.cambios = {
+                "editar": {},
+                "eliminar": [],
+                "crear": []
+            }
 
-                return
+            # ACTUALIZAR ORIGINAL
 
-            # Validar año 2026
-            if fecha_inicio.year != 2026:
+            self.df_original = self.df.copy()
 
-                QMessageBox.warning(
-                    self.window,
-                    "Fecha inválida",
-                    "La fecha de inicio debe pertenecer al año 2026."
-                )
+        except PermissionError:
 
-                return
-
-            if fecha_final.year != 2026:
-
-                QMessageBox.warning(
-                    self.window,
-                    "Fecha inválida",
-                    "La fecha final debe pertenecer al año 2026."
-                )
-
-                return
-
-            # ==========================================
-            # RUTA FINAL
-            # ==========================================
-
-            nombre_archivo = (
-                f"{nombre_archivo}.xlsx"
+            self.mostrar_error(
+                "Archivo bloqueado",
+                "Cierre el archivo CSV antes de guardar."
             )
 
-            # ruta_final = (
-            #     Path(self.ruta_guardado)
-            #     / nombre_archivo
-            # )
+        except Exception as e:
 
-            # ==========================================
-            # PROCESAMIENTO
-            # ==========================================
-
-            modelo = AsistenciaModel(
-                ruta_asistencia=self.ruta_excel,
-                ruta_guardado=self.ruta_guardado
-            )
-            modelo.cargar_archivos()
-
-
-            dataframe_resultado = (
-                modelo.procesar_asistencia()
+            self.mostrar_error(
+                "Error al guardar",
+                str(e)
             )
 
-            modelo.exportar_excel(
-                dataframe_resultado,
-                nombre_archivo
-            )
-            # ==========================================
-            # MENSAJE FINAL
-            # ==========================================
+    # ==================================================
+    # RECARGAR
+    # ==================================================
 
-            QMessageBox.information(
-                self.window,
-                "Proceso completado",
-                "El reporte fue generado correctamente."
-            )
-
-        except Exception as error:
-
-            QMessageBox.critical(
-                self.window,
-                "Error",
-                f"Ocurrió un error durante el proceso:\\n{error}"
-            )
-    
-    # ==========================================
-    # LIMPIAR TEXTOS
-    # ==========================================
-    def limpiar_campos(self):
+    def recargar_datos(self):
 
         try:
-            self.ui.buscar_archivo.clear()
-            self.ui.guardar_archivo.clear()
-            self.ui.nombre_archivo.clear()
 
-            # ==========================================
-            # LIMPIAR VARIABLES
-            # ==========================================
-            self.ruta_excel = ""
-            self.ruta_guardado = ""
+            self.cargar_tabla_operadores()
 
-            # ==========================================
-            # RESTABLECER FECHAS
-            # ==========================================
-            fecha_minima = QtCore.QDate(2026, 1, 1)
-            fecha_maxima = QtCore.QDate(2026, 12, 31)
-
-            # Limitar fechas
-            self.ui.dt_comienzo.setMinimumDate(
-                fecha_minima
+            self.mostrar_info(
+                "Datos actualizados",
+                "La tabla fue recargada."
             )
 
-            self.ui.dt_comienzo.setMaximumDate(
-                fecha_maxima
-            )
+        except Exception as e:
 
-            self.ui.dt_final.setMinimumDate(
-                fecha_minima
-            )
-
-            self.ui.dt_final.setMaximumDate(
-                fecha_maxima
-            )
-
-            # Fecha actual
-            hoy = QtCore.QDate.currentDate()
-            self.ui.dt_comienzo.setDate(fecha_minima)
-            self.ui.dt_final.setDate(hoy)
-
-            # ==========================================
-            # MENSAJE
-            # ==========================================
-
-            QMessageBox.information(
-                self.window,
-                "Campos limpiados",
-                "Todos los campos fueron restablecidos correctamente."
-            )
-
-        except Exception as error:
-
-            QMessageBox.critical(
-                self.window,
-                "Error",
-                f"Ocurrió un error al limpiar los campos:\\n{error}"
+            self.mostrar_error(
+                "Error al recargar",
+                str(e)
             )
