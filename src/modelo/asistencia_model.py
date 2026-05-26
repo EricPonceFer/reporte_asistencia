@@ -4,6 +4,17 @@ from config.config import (
     RUTA_CODIGOS,
     RUTA_VELADA
 )
+from openpyxl import Workbook
+from openpyxl.styles import (
+    Alignment,
+    Font,
+    Border,
+    Side
+)
+from openpyxl.utils import get_column_letter
+from openpyxl.worksheet.page import PageMargins
+
+from datetime import datetime, timedelta
 
 class ErrorArchivo(Exception):
     """Errores relacionados con archivos."""
@@ -540,6 +551,514 @@ class AsistenciaModel:
             "Hora_salida": inicio.time(),
             "Horas_trabajadas": 0
         }
+    
+    # =========================================================
+    # Reporte En Excel
+    # =========================================================
+    def _generar_formato_semanal(
+        self,
+        dataframe,
+        ruta_final
+    ):
+
+        try:
+
+            if dataframe.empty:
+
+                raise ErrorProcesamiento(
+                    "El DataFrame está vacío."
+                )
+
+            # =====================================================
+            # ESTILOS
+            # =====================================================
+
+            borde_fino = Border(
+                left=Side(style="thin"),
+                right=Side(style="thin"),
+                top=Side(style="thin"),
+                bottom=Side(style="thin")
+            )
+
+            # =====================================================
+            # WORKBOOK
+            # =====================================================
+
+            wb = Workbook()
+
+            wb.remove(wb.active)
+
+            # =====================================================
+            # DÍAS Y MESES
+            # =====================================================
+
+            dias_semana = [
+                "LUNES",
+                "MARTES",
+                "MIÉRCOLES",
+                "JUEVES",
+                "VIERNES",
+                "SÁBADO",
+                "DOMINGO"
+            ]
+
+            meses_es = {
+                1: "ENERO",
+                2: "FEBRERO",
+                3: "MARZO",
+                4: "ABRIL",
+                5: "MAYO",
+                6: "JUNIO",
+                7: "JULIO",
+                8: "AGOSTO",
+                9: "SEPTIEMBRE",
+                10: "OCTUBRE",
+                11: "NOVIEMBRE",
+                12: "DICIEMBRE"
+            }
+
+            # =====================================================
+            # OPERADORES ACTIVOS
+            # =====================================================
+
+            operadores_activos = (
+                self.dataframe_codigos[
+                    self.dataframe_codigos["ACTIVO"] == "SI"
+                ]["NOMBRES"]
+                .dropna()
+                .unique()
+            )
+
+            operadores_activos = sorted(
+                operadores_activos
+            )
+
+            # =====================================================
+            # AGRUPAR POR AÑO Y SEMANA
+            # =====================================================
+
+            for (anio, semana), grupo_semana in dataframe.groupby(
+                ["Año", "Semana"]
+            ):
+
+                # =================================================
+                # HOJA
+                # =================================================
+
+                ws = wb.create_sheet(
+                    title=f"{anio}-S{semana}"
+                )
+
+                # =================================================
+                # CONFIGURACIÓN IMPRESIÓN
+                # =================================================
+
+                ws.page_setup.orientation = (
+                    ws.ORIENTATION_LANDSCAPE
+                )
+
+                ws.page_setup.fitToWidth = 1
+
+                ws.page_setup.fitToHeight = False
+
+                ws.page_margins = PageMargins(
+                    left=0.2,
+                    right=0.2,
+                    top=0.3,
+                    bottom=0.3
+                )
+
+                ws.print_options.horizontalCentered = True
+
+                # =================================================
+                # FECHAS
+                # =================================================
+
+                mes = int(
+                    grupo_semana["Mes"].iloc[0]
+                )
+
+                nombre_mes = meses_es.get(
+                    mes,
+                    ""
+                )
+
+                lunes_semana = datetime.fromisocalendar(
+                    int(anio),
+                    int(semana),
+                    1
+                )
+
+                # =================================================
+                # TÍTULO
+                # =================================================
+
+                ws.merge_cells(
+                    start_row=1,
+                    start_column=2,
+                    end_row=1,
+                    end_column=15
+                )
+
+                ws["B1"] = (
+                    f"SEMANA {semana} - "
+                    f"{nombre_mes} {anio}"
+                )
+
+                ws["B1"].alignment = Alignment(
+                    horizontal="center"
+                )
+
+                ws["B1"].font = Font(
+                    bold=True,
+                    size=14
+                )
+
+                # Bordes título
+                for col in range(2, 16):
+
+                    ws.cell(
+                        row=1,
+                        column=col
+                    ).border = borde_fino
+
+                # =================================================
+                # ENCABEZADO IZQUIERDO
+                # =================================================
+
+                ws["A2"] = f"MES: {nombre_mes}"
+
+                ws["A2"].font = Font(
+                    bold=True
+                )
+
+                ws.merge_cells("A3:A4")
+
+                ws["A3"] = "OPERADOR"
+
+                ws["A3"].alignment = Alignment(
+                    horizontal="center",
+                    vertical="center"
+                )
+
+                ws["A3"].font = Font(
+                    bold=True
+                )
+
+                for fila in range(2, 5):
+
+                    ws.cell(
+                        row=fila,
+                        column=1
+                    ).border = borde_fino
+
+                # =================================================
+                # ENCABEZADO DÍAS
+                # =================================================
+
+                col = 2
+
+                for i, dia_nombre in enumerate(
+                    dias_semana
+                ):
+
+                    fecha_real = (
+                        lunes_semana
+                        + timedelta(days=i)
+                    )
+
+                    numero_dia = fecha_real.day
+
+                    # =============================================
+                    # DÍA
+                    # =============================================
+
+                    ws.merge_cells(
+                        start_row=2,
+                        start_column=col,
+                        end_row=2,
+                        end_column=col + 1
+                    )
+
+                    ws.cell(
+                        row=2,
+                        column=col
+                    ).value = dia_nombre
+
+                    ws.cell(
+                        row=2,
+                        column=col
+                    ).alignment = Alignment(
+                        horizontal="center"
+                    )
+
+                    ws.cell(
+                        row=2,
+                        column=col
+                    ).font = Font(
+                        bold=True
+                    )
+
+                    # =============================================
+                    # NÚMERO DÍA
+                    # =============================================
+
+                    ws.merge_cells(
+                        start_row=3,
+                        start_column=col,
+                        end_row=3,
+                        end_column=col + 1
+                    )
+
+                    ws.cell(
+                        row=3,
+                        column=col
+                    ).value = numero_dia
+
+                    ws.cell(
+                        row=3,
+                        column=col
+                    ).alignment = Alignment(
+                        horizontal="center"
+                    )
+
+                    # =============================================
+                    # ENTRADA / SALIDA
+                    # =============================================
+
+                    ws.cell(
+                        row=4,
+                        column=col
+                    ).value = "ENTRADA"
+
+                    ws.cell(
+                        row=4,
+                        column=col + 1
+                    ).value = "SALIDA"
+
+                    ws.cell(
+                        row=4,
+                        column=col
+                    ).alignment = Alignment(
+                        horizontal="center"
+                    )
+
+                    ws.cell(
+                        row=4,
+                        column=col + 1
+                    ).alignment = Alignment(
+                        horizontal="center"
+                    )
+
+                    # =============================================
+                    # BORDES
+                    # =============================================
+
+                    for fila in range(2, 5):
+
+                        for columna in range(
+                            col,
+                            col + 2
+                        ):
+
+                            ws.cell(
+                                row=fila,
+                                column=columna
+                            ).border = borde_fino
+
+                    col += 2
+
+                # =================================================
+                # DATOS
+                # =================================================
+
+                fila_excel = 5
+
+                for nombre in operadores_activos:
+
+                    grupo_operador = grupo_semana[
+                        grupo_semana["Nombre Completo"]
+                        == nombre
+                    ]
+
+                    # =============================================
+                    # NOMBRE OPERADOR
+                    # =============================================
+
+                    ws.cell(
+                        row=fila_excel,
+                        column=1
+                    ).value = nombre
+
+                    ws.cell(
+                        row=fila_excel,
+                        column=1
+                    ).alignment = Alignment(
+                        horizontal="left"
+                    )
+
+                    ws.cell(
+                        row=fila_excel,
+                        column=1
+                    ).border = borde_fino
+
+                    # =============================================
+                    # DÍAS
+                    # =============================================
+
+                    col = 2
+
+                    for i in range(7):
+
+                        fecha_real = (
+                            lunes_semana
+                            + timedelta(days=i)
+                        ).date()
+
+                        registro = grupo_operador[
+                            grupo_operador["Fecha"]
+                            == fecha_real
+                        ]
+
+                        if not registro.empty:
+
+                            hora_entrada = registro.iloc[0][
+                                "Hora_entrada"
+                            ]
+
+                            hora_salida = registro.iloc[0][
+                                "Hora_salida"
+                            ]
+
+                            # =====================================
+                            # HORA ENTRADA
+                            # =====================================
+
+                            if pd.notna(hora_entrada):
+
+                                celda_entrada = ws.cell(
+                                    row=fila_excel,
+                                    column=col
+                                )
+
+                                celda_entrada.value = (
+                                    hora_entrada
+                                )
+
+                                celda_entrada.number_format = (
+                                    "hh:mm"
+                                )
+
+                            # =====================================
+                            # HORA SALIDA
+                            # =====================================
+
+                            if pd.notna(hora_salida):
+
+                                celda_salida = ws.cell(
+                                    row=fila_excel,
+                                    column=col + 1
+                                )
+
+                                celda_salida.value = (
+                                    hora_salida
+                                )
+
+                                celda_salida.number_format = (
+                                    "hh:mm"
+                                )
+
+                        # =========================================
+                        # ESTILOS CELDAS
+                        # =========================================
+
+                        ws.cell(
+                            row=fila_excel,
+                            column=col
+                        ).border = borde_fino
+
+                        ws.cell(
+                            row=fila_excel,
+                            column=col + 1
+                        ).border = borde_fino
+
+                        ws.cell(
+                            row=fila_excel,
+                            column=col
+                        ).alignment = Alignment(
+                            horizontal="center"
+                        )
+
+                        ws.cell(
+                            row=fila_excel,
+                            column=col + 1
+                        ).alignment = Alignment(
+                            horizontal="center"
+                        )
+
+                        col += 2
+
+                    fila_excel += 1
+
+                # =================================================
+                # ÁREA IMPRESIÓN
+                # =================================================
+
+                ws.print_area = (
+                    f"A1:O{fila_excel - 1}"
+                )
+
+                # =================================================
+                # AUTO WIDTH COLUMNA A
+                # =================================================
+
+                max_length = 0
+
+                for fila in ws.iter_rows(
+                    min_col=1,
+                    max_col=1
+                ):
+
+                    for cell in fila:
+
+                        if cell.value:
+
+                            max_length = max(
+                                max_length,
+                                len(str(cell.value))
+                            )
+
+                ws.column_dimensions["A"].width = (
+                    max_length + 6
+                )
+
+                # =================================================
+                # ANCHO COLUMNAS
+                # =================================================
+
+                for i in range(2, 17):
+
+                    ws.column_dimensions[
+                        get_column_letter(i)
+                    ].width = 11
+
+            # =====================================================
+            # GUARDAR
+            # =====================================================
+
+            wb.save(ruta_final)
+
+        except PermissionError:
+
+            raise ErrorProcesamiento(
+                "Cierre el archivo Excel antes de guardar."
+            )
+
+        except Exception as error:
+
+            raise ErrorProcesamiento(
+                f"Error generando formato semanal:\n{error}"
+            )
 
     # =========================================================
     # EXPORTAR
@@ -558,9 +1077,9 @@ class AsistenciaModel:
                 / nombre_archivo
             )
 
-            dataframe.to_excel(
-                ruta_final,
-                index=False
+            self._generar_formato_semanal(
+                dataframe,
+                ruta_final
             )
 
         except Exception as error:

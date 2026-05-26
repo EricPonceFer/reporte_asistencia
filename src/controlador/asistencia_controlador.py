@@ -204,22 +204,22 @@ class Controlador_Reporte_Asitencia:
                 return
 
             # Validar año 2026
-            if fecha_inicio.year != 2026:
+            if fecha_inicio.year < 2026:
 
                 QMessageBox.warning(
                     self.window,
                     "Fecha inválida",
-                    "La fecha de inicio debe pertenecer al año 2026."
+                    "La fecha de inicio debe ser mayor o igual al año 2026."
                 )
 
                 return
 
-            if fecha_final.year != 2026:
+            if fecha_final.year < 2026:
 
                 QMessageBox.warning(
                     self.window,
                     "Fecha inválida",
-                    "La fecha final debe pertenecer al año 2026."
+                    "La fecha final debe ser mayor al año 2025."
                 )
 
                 return
