@@ -249,7 +249,7 @@ class Controlador_Reporte_Asitencia:
 
 
             dataframe_resultado = (
-                modelo.procesar_asistencia()
+                modelo.procesar_asistencia(fecha_inicio, fecha_final)
             )
 
             modelo.exportar_excel(

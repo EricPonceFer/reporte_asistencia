@@ -213,15 +213,66 @@ class AsistenciaModel:
             "Personal de velada"
         )
 
+    def _filtrar_rango_fechas(
+        self,
+        fecha_inicio,
+        fecha_final
+    ):
+        try:
+
+            fecha_inicio = pd.to_datetime(
+                fecha_inicio
+            )
+
+            fecha_final = pd.to_datetime(
+                fecha_final
+            )
+
+            if fecha_inicio > fecha_final:
+
+                raise ErrorProcesamiento(
+                    "La fecha inicial no puede ser mayor a la final."
+                )
+
+            mascara = (
+                self.dataframe_asistencia["Fecha y hora"]
+                .dt.date
+                .between(
+                    fecha_inicio.date(),
+                    fecha_final.date()
+                )
+            )
+
+            self.dataframe_asistencia = (
+                self.dataframe_asistencia[
+                    mascara
+                ].copy()
+            )
+
+            if self.dataframe_asistencia.empty:
+
+                raise ErrorProcesamiento(
+                    "No existen registros dentro del rango seleccionado."
+                )
+
+        except Exception as error:
+
+            raise ErrorProcesamiento(
+                f"Error filtrando fechas:\n{error}"
+            )
     # =========================================================
     # PROCESAMIENTO PRINCIPAL
     # =========================================================
 
-    def procesar_asistencia(self):
+    def procesar_asistencia(self, fecha_inicio, fecha_final):
 
         try:
 
             self._convertir_fechas()
+            self._filtrar_rango_fechas(
+                fecha_inicio,
+                fecha_final
+            )
             self._crear_columnas_fecha()
             self._unir_codigos_nombres()
             self._procesar_turnos_velada()
