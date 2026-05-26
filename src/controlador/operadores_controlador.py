@@ -189,6 +189,27 @@ class Controlador_Operadores:
             # RECARGAR TABLA
             # ==========================================
 
+            if self.ui.rd_activados.isChecked():
+                dataframe_filtrado = (
+                    dataframe_filtrado[
+                        dataframe_filtrado["ACTIVO"]
+                        .astype(str)
+                        .str.upper()
+                        == "SI"
+                    ]
+                )
+
+            elif self.ui.rd_desactivados.isChecked():
+
+                dataframe_filtrado = (
+                    dataframe_filtrado[
+                        dataframe_filtrado["ACTIVO"]
+                        .astype(str)
+                        .str.upper()
+                        == "NO"
+                    ]
+                )
+
             self.modelo_tabla._df = self.df
             self.modelo_tabla.layoutChanged.emit()
 
