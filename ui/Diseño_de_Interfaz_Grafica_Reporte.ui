@@ -1048,6 +1048,12 @@ border-bottom: 2px solid blue;
                    <bold>true</bold>
                   </font>
                  </property>
+                 <property name="styleSheet">
+                  <string notr="true">QRadioButton::indicator:checked {
+    background-color: rgb(70, 130, 255);
+    border: 2px solid rgb(40, 90, 200);
+}</string>
+                 </property>
                  <property name="text">
                   <string>Disponibles</string>
                  </property>
@@ -1066,6 +1072,12 @@ border-bottom: 2px solid blue;
                    <family>Poppins</family>
                    <bold>true</bold>
                   </font>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QRadioButton::indicator:checked {
+    background-color: rgb(70, 130, 255);
+    border: 2px solid rgb(40, 90, 200);
+}</string>
                  </property>
                  <property name="text">
                   <string>No Disponibles</string>
@@ -1116,7 +1128,7 @@ QPushButton:pressed {
                  <property name="geometry">
                   <rect>
                    <x>20</x>
-                   <y>30</y>
+                   <y>10</y>
                    <width>101</width>
                    <height>41</height>
                   </rect>
@@ -1148,8 +1160,8 @@ QPushButton:pressed {
                 <widget class="QPushButton" name="btn_recargar">
                  <property name="geometry">
                   <rect>
-                   <x>160</x>
-                   <y>30</y>
+                   <x>150</x>
+                   <y>10</y>
                    <width>101</width>
                    <height>41</height>
                   </rect>
@@ -1174,6 +1186,39 @@ QPushButton#btn_recargar:pressed {
                  </property>
                  <property name="text">
                   <string>RECARGAR</string>
+                 </property>
+                </widget>
+                <widget class="QPushButton" name="btn_crear_op">
+                 <property name="geometry">
+                  <rect>
+                   <x>90</x>
+                   <y>60</y>
+                   <width>101</width>
+                   <height>41</height>
+                  </rect>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QPushButton {
+    background-color: rgb(46, 204, 113);
+    color: black;
+    border: 1px solid rgb(39, 174, 96);
+    border-radius: 12px;
+    padding: 10px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    background-color: rgb(39, 174, 96);
+}
+
+QPushButton:pressed {
+    background-color: rgb(30, 132, 73);
+    padding-left: 11px;
+    padding-top: 11px;
+}</string>
+                 </property>
+                 <property name="text">
+                  <string>CREAR</string>
                  </property>
                 </widget>
                </widget>
@@ -1543,7 +1588,7 @@ QCalendarWidget QAbstractItemView:enabled {
                  </property>
                  <property name="dateTime">
                   <datetime>
-                   <hour>10</hour>
+                   <hour>20</hour>
                    <minute>0</minute>
                    <second>0</second>
                    <year>2026</year>
@@ -1619,8 +1664,8 @@ QPushButton:pressed {
                 <widget class="QPushButton" name="btn_eliminar">
                  <property name="geometry">
                   <rect>
-                   <x>160</x>
-                   <y>30</y>
+                   <x>150</x>
+                   <y>10</y>
                    <width>101</width>
                    <height>41</height>
                   </rect>
@@ -1650,8 +1695,8 @@ QPushButton#btn_eliminar:pressed {
                 <widget class="QPushButton" name="btn_guardar_vl">
                  <property name="geometry">
                   <rect>
-                   <x>20</x>
-                   <y>30</y>
+                   <x>10</x>
+                   <y>10</y>
                    <width>101</width>
                    <height>41</height>
                   </rect>
@@ -1678,6 +1723,39 @@ QPushButton:pressed {
                  </property>
                  <property name="text">
                   <string>GUARDAR</string>
+                 </property>
+                </widget>
+                <widget class="QPushButton" name="btn_crear_op_2">
+                 <property name="geometry">
+                  <rect>
+                   <x>80</x>
+                   <y>60</y>
+                   <width>101</width>
+                   <height>41</height>
+                  </rect>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QPushButton {
+    background-color: rgb(46, 204, 113);
+    color: black;
+    border: 1px solid rgb(39, 174, 96);
+    border-radius: 12px;
+    padding: 10px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    background-color: rgb(39, 174, 96);
+}
+
+QPushButton:pressed {
+    background-color: rgb(30, 132, 73);
+    padding-left: 11px;
+    padding-top: 11px;
+}</string>
+                 </property>
+                 <property name="text">
+                  <string>CREAR</string>
                  </property>
                 </widget>
                </widget>

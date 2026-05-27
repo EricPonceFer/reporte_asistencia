@@ -1,10 +1,7 @@
-from PyQt6.QtWidgets import (
-    QMessageBox,
-    QInputDialog
-)
-
+from PyQt6.QtWidgets import (QMessageBox, QInputDialog, QMenu)
+import pandas as pd
 from PyQt6.QtCore import Qt
-
+from vista.ventana_modificacion import VentanaModificar
 from modelo.dataframe_model import CSVModel
 from modelo.table_dataframe_model import DataFrameModel
 
@@ -41,7 +38,8 @@ class Controlador_Operadores:
 
         self.cambios = {
             "editar": {},
-            "crear": []
+            "crear": [],
+            "eliminar":[],
         }
 
         # ==========================================
@@ -65,7 +63,13 @@ class Controlador_Operadores:
         # ==========================================
 
         self.cargar_tabla_operadores()
+        self.ui.tb_operadores.setContextMenuPolicy(
+            Qt.ContextMenuPolicy.CustomContextMenu
+        )
 
+        self.ui.tb_operadores.customContextMenuRequested.connect(
+            self.menu_operadores
+        )
     # ==================================================
     # MENSAJES
     # ==================================================
@@ -108,7 +112,8 @@ class Controlador_Operadores:
             # COPIA ORIGINAL
 
             self.df_original = self.df.copy()
-            self.df = self.df.drop(columns="Cantidad")
+            self.df = self.df
+            
             # MODELO TABLA
 
             self.modelo_tabla = DataFrameModel(self.df)
@@ -151,21 +156,21 @@ class Controlador_Operadores:
             )
 
             # ==========================================
-            # SIN TEXTO
+            # FILTRO BASE
             # ==========================================
 
-            if not texto:
+            filtro = pd.Series(
+                True,
+                index=self.df_original.index
+            )
 
-                self.df = self.df_original.copy()
+            # ==========================================
+            # FILTRO POR TEXTO
+            # ==========================================
 
-            else:
+            if texto:
 
-                # ==========================================
-                # FILTRAR SOLO POR:
-                # CODIGO Y NOMBRES
-                # ==========================================
-
-                filtro = (
+                filtro_texto = (
 
                     self.df_original["CODIGO"]
                     .astype(str)
@@ -181,37 +186,51 @@ class Controlador_Operadores:
 
                 )
 
-                self.df = self.df_original[
-                    filtro
-                ].copy()
+                filtro &= filtro_texto
+
+            # ==========================================
+            # FILTRO POR ACTIVO
+            # ==========================================
+
+            if self.ui.rb_Disponibles.isChecked():
+
+                filtro_activo = (
+
+                    self.df_original["ACTIVO"]
+                    .astype(str)
+                    .str.upper()
+                    == "SI"
+                )
+
+                filtro &= filtro_activo
+
+            elif self.ui.rb_NDisponibles.isChecked():
+
+                filtro_activo = (
+
+                    self.df_original["ACTIVO"]
+                    .astype(str)
+                    .str.upper()
+                    == "NO"
+                )
+
+                filtro &= filtro_activo
+
+            # ==========================================
+            # FILTRAR DATAFRAME
+            # ==========================================
+
+            self.df = self.df_original[
+                filtro
+            ].copy()
 
             # ==========================================
             # RECARGAR TABLA
             # ==========================================
 
-            if self.ui.rd_activados.isChecked():
-                dataframe_filtrado = (
-                    dataframe_filtrado[
-                        dataframe_filtrado["ACTIVO"]
-                        .astype(str)
-                        .str.upper()
-                        == "SI"
-                    ]
-                )
-
-            elif self.ui.rd_desactivados.isChecked():
-
-                dataframe_filtrado = (
-                    dataframe_filtrado[
-                        dataframe_filtrado["ACTIVO"]
-                        .astype(str)
-                        .str.upper()
-                        == "NO"
-                    ]
-                )
-
             self.modelo_tabla._df = self.df
             self.modelo_tabla.layoutChanged.emit()
+            self.ui.tb_operadores.resizeColumnsToContents()
 
         except KeyError as e:
 
@@ -227,6 +246,126 @@ class Controlador_Operadores:
                 str(e)
             )
 
+    # ==================================================
+    # MENU CONCEPTUAL
+    # ==================================================
+
+    def menu_operadores(self, posicion):
+
+        try:
+
+            index = self.ui.tb_operadores.indexAt(posicion)
+
+            if not index.isValid():
+                return
+
+            menu = QMenu()
+
+            accion_modificar = menu.addAction(
+                "Modificar"
+            )
+
+            accion_eliminar = menu.addAction(
+                "Eliminar"
+            )
+
+            accion = menu.exec(
+                self.ui.tb_operadores.viewport().mapToGlobal(posicion)
+            )
+
+            # ==========================================
+            # MODIFICAR
+            # ==========================================
+
+            if accion == accion_modificar:
+
+                self.modificar_fila(
+                    index.row()
+                )
+
+            # ==========================================
+            # ELIMINAR
+            # ==========================================
+
+            elif accion == accion_eliminar:
+
+                self.eliminar_fila(
+                    index.row()
+                )
+
+        except Exception as e:
+
+            self.mostrar_error(
+                "Error",
+                str(e)
+            )
+
+    def modificar_fila(self, fila):
+
+        try:
+
+            datos = self.df.iloc[fila]
+
+            ventana = VentanaModificar(
+                datos,
+                self.window
+            )
+
+            if ventana.exec():
+
+                columna = ventana.columna
+                nuevo_valor = ventana.valor
+
+                # ==========================================
+                # TIPO ORIGINAL
+                # ==========================================
+
+                valor_original = self.df.at[
+                    fila,
+                    columna
+                ]
+
+                tipo_original = type(
+                    valor_original
+                )
+
+                nuevo_valor = tipo_original(
+                    nuevo_valor
+                )
+                # ==========================================
+                # ACTUALIZAR DATAFRAME
+                # ==========================================
+
+                self.df.at[
+                    fila,
+                    columna
+                ] = nuevo_valor
+
+                # ==========================================
+                # REFRESCAR TABLA
+                # ==========================================
+
+                self.modelo_tabla._df = self.df
+                self.modelo_tabla.layoutChanged.emit()
+
+                self.mostrar_info(
+                    "Registro actualizado",
+                    "Campo modificado correctamente."
+                )
+
+        except ValueError:
+
+            self.mostrar_error(
+                "Dato inválido",
+                "El tipo de dato ingresado no es válido."
+            )
+
+        except Exception as e:
+
+            self.mostrar_error(
+                "Error al modificar",
+                f"Ocurrió un error:\n{e}"
+            )
     # ==================================================
     # REGISTRAR EDICION
     # ==================================================
@@ -256,22 +395,20 @@ class Controlador_Operadores:
     # ELIMINAR FILA
     # ==================================================
 
-    def eliminar_fila(self):
+    def eliminar_fila(self, fila):
 
         try:
 
-            index = self.ui.tb_operadores.currentIndex()
+            respuesta = QMessageBox.question(
+                self.window,
+                "Confirmar eliminación",
+                "¿Desea eliminar el registro?",
+                QMessageBox.StandardButton.Yes |
+                QMessageBox.StandardButton.No
+            )
 
-            if not index.isValid():
-
-                self.mostrar_error(
-                    "Selección requerida",
-                    "Seleccione una fila."
-                )
-
+            if respuesta != QMessageBox.StandardButton.Yes:
                 return
-
-            fila = index.row()
 
             id_operador = str(
                 self.df.iloc[fila, 0]
@@ -309,7 +446,7 @@ class Controlador_Operadores:
 
             self.mostrar_error(
                 "Error al eliminar",
-                str(e)
+                f"No se Logro Eliminar el Registro  {e}"
             )
 
     # ==================================================
@@ -433,7 +570,15 @@ class Controlador_Operadores:
 
         try:
 
-            self.cargar_tabla_operadores()
+            self.modelo_tabla._df = self.df_original
+            self.modelo_tabla.layoutChanged.emit()
+            print(self.df_original)
+
+            self.cambios = {
+                "editar": {},
+                "eliminar": [],
+                "crear": []
+            }
 
             self.mostrar_info(
                 "Datos actualizados",
