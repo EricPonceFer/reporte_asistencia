@@ -39,7 +39,7 @@ class Controlador_Operadores:
         self.cambios = {
             "editar": {},
             "crear": [],
-            "eliminar":[],
+            "eliminar": [],
         }
 
         # ==========================================
@@ -57,6 +57,10 @@ class Controlador_Operadores:
         self.ui.btn_recargar.clicked.connect(
             self.recargar_datos
         )
+
+        # self.ui.btn_crear_op.clicked.connect(
+        #     self.crear_fila
+        # )
 
         # ==========================================
         # CARGAR TABLA
@@ -112,7 +116,6 @@ class Controlador_Operadores:
             # COPIA ORIGINAL
 
             self.df_original = self.df.copy()
-            self.df = self.df
             
             # MODELO TABLA
 
@@ -254,10 +257,16 @@ class Controlador_Operadores:
 
         try:
 
-            index = self.ui.tb_operadores.indexAt(posicion)
+            index = self.ui.tb_operadores.indexAt(
+                posicion
+            )
 
             if not index.isValid():
                 return
+
+            indice_real = self.df.index[
+                index.row()
+            ]
 
             menu = QMenu()
 
@@ -265,12 +274,14 @@ class Controlador_Operadores:
                 "Modificar"
             )
 
-            accion_eliminar = menu.addAction(
-                "Eliminar"
-            )
+            # accion_eliminar = menu.addAction(
+            #     "Eliminar"
+            # )
 
             accion = menu.exec(
-                self.ui.tb_operadores.viewport().mapToGlobal(posicion)
+                self.ui.tb_operadores
+                .viewport()
+                .mapToGlobal(posicion)
             )
 
             # ==========================================
@@ -280,24 +291,24 @@ class Controlador_Operadores:
             if accion == accion_modificar:
 
                 self.modificar_fila(
-                    index.row()
+                    indice_real
                 )
 
             # ==========================================
             # ELIMINAR
             # ==========================================
 
-            elif accion == accion_eliminar:
+            # elif accion == accion_eliminar:
 
-                self.eliminar_fila(
-                    index.row()
-                )
+            #     self.eliminar_fila(
+            #         indice_real
+            #     )
 
         except Exception as e:
 
             self.mostrar_error(
                 "Error",
-                str(e)
+                f"Error en realizar la acción:\n{e}"
             )
 
     def modificar_fila(self, fila):
@@ -316,11 +327,8 @@ class Controlador_Operadores:
                 columna = ventana.columna
                 nuevo_valor = ventana.valor
 
-                # ==========================================
-                # TIPO ORIGINAL
-                # ==========================================
 
-                valor_original = self.df.at[
+                valor_original = self.df_original.at[
                     fila,
                     columna
                 ]
@@ -332,20 +340,24 @@ class Controlador_Operadores:
                 nuevo_valor = tipo_original(
                     nuevo_valor
                 )
-                # ==========================================
-                # ACTUALIZAR DATAFRAME
-                # ==========================================
+
+
+                if fila not in self.cambios["editar"]:
+
+                    self.cambios["editar"][fila] = {}
+
+
+                self.cambios["editar"][fila][
+                    columna
+                ] = nuevo_valor
 
                 self.df.at[
                     fila,
                     columna
                 ] = nuevo_valor
 
-                # ==========================================
-                # REFRESCAR TABLA
-                # ==========================================
-
                 self.modelo_tabla._df = self.df
+
                 self.modelo_tabla.layoutChanged.emit()
 
                 self.mostrar_info(
@@ -474,24 +486,31 @@ class Controlador_Operadores:
 
                 nueva_fila[columna] = valor
 
-            # AGREGAR
-
-            self.df.loc[len(self.df)] = nueva_fila
-
-            # REGISTRAR
+            # REGISTRAR EN CAMBIOS
 
             self.cambios["crear"].append(
                 nueva_fila
             )
 
-            # ACTUALIZAR
+            # AGREGAR A DATAFRAME TEMPORAL
+
+            self.df = pd.concat(
+                [
+                    self.df,
+                    pd.DataFrame([nueva_fila])
+                ],
+                ignore_index=True
+            )
+
+            # ACTUALIZAR TABLA
 
             self.modelo_tabla._df = self.df
             self.modelo_tabla.layoutChanged.emit()
+            self.ui.tb_operadores.resizeColumnsToContents()
 
             self.mostrar_info(
                 "Registro creado",
-                "Nuevo registro agregado."
+                "Nuevo registro agregado. Guarde para confirmar."
             )
 
         except Exception as e:
@@ -509,18 +528,45 @@ class Controlador_Operadores:
 
         try:
 
-            # ==========================================
-            # GUARDAR CSV
-            # ==========================================
+            df_actualizado = self.df_original.copy()
 
-            self.df.to_csv(
+            if self.cambios["eliminar"]:
+                df_actualizado = df_actualizado.drop(
+                    self.cambios["eliminar"]
+                )
+
+            for fila, cambios_fila in self.cambios["editar"].items():
+
+                for columna, nuevo_valor in cambios_fila.items():
+
+                    df_actualizado.at[
+                        fila,
+                        columna
+                    ] = nuevo_valor
+
+            if self.cambios["crear"]:
+
+                df_nuevas = pd.DataFrame(
+                    self.cambios["crear"]
+                )
+
+                df_actualizado = pd.concat(
+                    [
+                        df_actualizado,
+                        df_nuevas
+                    ],
+                    ignore_index=True
+                )
+
+            df_actualizado = df_actualizado.reset_index(drop=True)
+
+            df_actualizado.to_csv(
                 RUTA_CODIGOS,
                 index=False
             )
 
-            # ==========================================
-            # MOSTRAR CAMBIOS
-            # ==========================================
+            self.df = df_actualizado.copy()
+            self.df_original = df_actualizado.copy()
 
             resumen = (
                 f"Editados: "
@@ -536,17 +582,11 @@ class Controlador_Operadores:
                 resumen
             )
 
-            # LIMPIAR CONTROL
-
             self.cambios = {
                 "editar": {},
-                "eliminar": [],
-                "crear": []
+                "crear": [],
+                "eliminar": []
             }
-
-            # ACTUALIZAR ORIGINAL
-
-            self.df_original = self.df.copy()
 
         except PermissionError:
 
@@ -561,7 +601,6 @@ class Controlador_Operadores:
                 "Error al guardar",
                 str(e)
             )
-
     # ==================================================
     # RECARGAR
     # ==================================================
@@ -569,16 +608,17 @@ class Controlador_Operadores:
     def recargar_datos(self):
 
         try:
-
-            self.modelo_tabla._df = self.df_original
-            self.modelo_tabla.layoutChanged.emit()
-            print(self.df_original)
+            self.df = self.df_original.copy()
 
             self.cambios = {
                 "editar": {},
-                "eliminar": [],
-                "crear": []
+                "crear": [],
+                "eliminar": []
             }
+
+            self.modelo_tabla._df = self.df
+
+            self.modelo_tabla.layoutChanged.emit()
 
             self.mostrar_info(
                 "Datos actualizados",
