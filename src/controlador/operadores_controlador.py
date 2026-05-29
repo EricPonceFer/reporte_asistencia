@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import (QMessageBox, QInputDialog, QMenu)
 import pandas as pd
 from PyQt6.QtCore import Qt
+from datetime import datetime
 from vista.ventana_modificacion import VentanaModificar
 from modelo.dataframe_model import CSVModel
 from modelo.table_dataframe_model import DataFrameModel
@@ -31,6 +32,12 @@ class Controlador_Operadores:
         self.df_original = None
 
         self.modelo_tabla = None
+        
+        # ==========================================
+        # MAPEO DE INDICES
+        # ==========================================
+        
+        self.indice_mapa = {}  # Mapea posición visual -> índice original
 
         # ==========================================
         # CONTROL DE CAMBIOS
@@ -117,6 +124,10 @@ class Controlador_Operadores:
 
             self.df_original = self.df.copy()
             
+            # INICIALIZAR MAPEO DE INDICES
+            
+            self._actualizar_mapeo_indices()
+            
             # MODELO TABLA
 
             self.modelo_tabla = DataFrameModel(self.df)
@@ -143,6 +154,19 @@ class Controlador_Operadores:
                 "Error",
                 str(e)
             )
+
+    # ==================================================
+    # ACTUALIZAR MAPEO DE INDICES
+    # ==================================================
+
+    def _actualizar_mapeo_indices(self):
+        """
+        Crea un mapeo entre posiciones visuales (0, 1, 2...)
+        e índices originales del dataframe.
+        """
+        self.indice_mapa = {}
+        for posicion, indice_original in enumerate(self.df.index):
+            self.indice_mapa[posicion] = indice_original
 
     # ==================================================
     # FILTRAR
@@ -226,6 +250,14 @@ class Controlador_Operadores:
             self.df = self.df_original[
                 filtro
             ].copy()
+            
+            # RESETEAR INDICES PARA CONSISTENCIA
+            
+            self.df.reset_index(drop=True, inplace=True)
+            
+            # ACTUALIZAR MAPEO DE INDICES
+            
+            self._actualizar_mapeo_indices()
 
             # ==========================================
             # RECARGAR TABLA
@@ -264,9 +296,13 @@ class Controlador_Operadores:
             if not index.isValid():
                 return
 
-            indice_real = self.df.index[
-                index.row()
-            ]
+            # OBTENER INDICE ORIGINAL USANDO MAPEO
+            
+            posicion_visual = index.row()
+            indice_real = self.indice_mapa.get(
+                posicion_visual,
+                self.df_original.index[posicion_visual]
+            )
 
             menu = QMenu()
 
@@ -291,6 +327,7 @@ class Controlador_Operadores:
             if accion == accion_modificar:
 
                 self.modificar_fila(
+                    posicion_visual,
                     indice_real
                 )
 
@@ -311,11 +348,11 @@ class Controlador_Operadores:
                 f"Error en realizar la acción:\n{e}"
             )
 
-    def modificar_fila(self, fila):
+    def modificar_fila(self, posicion_visual, indice_original):
 
         try:
 
-            datos = self.df.iloc[fila]
+            datos = self.df.iloc[posicion_visual]
 
             ventana = VentanaModificar(
                 datos,
@@ -327,9 +364,8 @@ class Controlador_Operadores:
                 columna = ventana.columna
                 nuevo_valor = ventana.valor
 
-
                 valor_original = self.df_original.at[
-                    fila,
+                    indice_original,
                     columna
                 ]
 
@@ -337,22 +373,29 @@ class Controlador_Operadores:
                     valor_original
                 )
 
-                nuevo_valor = tipo_original(
-                    nuevo_valor
+                # ==========================================
+                # VALIDAR SEGUN TIPO DE DATO
+                # ==========================================
+
+                nuevo_valor = self._validar_tipo_dato(
+                    nuevo_valor,
+                    tipo_original,
+                    columna
                 )
 
+                if nuevo_valor is None:
+                    return
 
-                if fila not in self.cambios["editar"]:
+                if indice_original not in self.cambios["editar"]:
 
-                    self.cambios["editar"][fila] = {}
+                    self.cambios["editar"][indice_original] = {}
 
-
-                self.cambios["editar"][fila][
+                self.cambios["editar"][indice_original][
                     columna
                 ] = nuevo_valor
 
                 self.df.at[
-                    fila,
+                    posicion_visual,
                     columna
                 ] = nuevo_valor
 
@@ -365,19 +408,72 @@ class Controlador_Operadores:
                     "Campo modificado correctamente."
                 )
 
-        except ValueError:
-
-            self.mostrar_error(
-                "Dato inválido",
-                "El tipo de dato ingresado no es válido."
-            )
-
         except Exception as e:
 
             self.mostrar_error(
                 "Error al modificar",
                 f"Ocurrió un error:\n{e}"
             )
+
+    # ==================================================
+    # VALIDAR TIPO DE DATO
+    # ==================================================
+
+    def _validar_tipo_dato(self, valor, tipo_esperado, nombre_columna):
+        """
+        Valida el valor según el tipo de dato esperado
+        y muestra mensajes específicos de error
+        """
+        # ==========================================
+        # ENTEROS (int64)
+        # ==========================================
+        if pd.api.types.is_integer_dtype(tipo_esperado):
+            try:
+                return int(valor)
+            except ValueError:
+                self.mostrar_error(
+                    "Dato inválido",
+                    f"El campo '{nombre_columna}' requiere un número entero."
+                )
+                return None
+
+        # ==========================================
+        # DECIMALES (float64)
+        # ==========================================
+        elif pd.api.types.is_float_dtype(tipo_esperado):
+            try:
+                return float(valor)
+            except ValueError:
+                self.mostrar_error(
+                    "Dato inválido",
+                    f"El campo '{nombre_columna}' requiere un número decimal."
+                )
+                return None
+
+        # ==========================================
+        # BOOLEANOS
+        # ==========================================
+        elif pd.api.types.is_bool_dtype(tipo_esperado):
+            valor_lower = str(valor).lower().strip()
+
+            if valor_lower in ("si", "true", "1", "v", "verdadero"):
+                return True
+            elif valor_lower in ("no", "false", "0", "f", "falso"):
+                return False
+            else:
+                self.mostrar_error(
+                    "Dato inválido",
+                    f"El campo '{nombre_columna}' requiere un valor booleano (SI/NO)."
+                )
+                return None
+
+        # ==========================================
+        # TEXTO (object)
+        # ==========================================
+        else:
+            return str(valor)
+
+
     # ==================================================
     # REGISTRAR EDICION
     # ==================================================
@@ -386,14 +482,15 @@ class Controlador_Operadores:
 
         try:
 
-            for fila in range(len(self.df)):
+            for posicion in range(len(self.df)):
 
-                id_operador = str(
-                    self.df.iloc[fila, 0]
+                indice_original = self.indice_mapa.get(
+                    posicion,
+                    self.df_original.index[posicion]
                 )
 
-                self.cambios["editar"][id_operador] = (
-                    self.df.iloc[fila].to_dict()
+                self.cambios["editar"][indice_original] = (
+                    self.df.iloc[posicion].to_dict()
                 )
 
         except Exception as e:
@@ -401,64 +498,6 @@ class Controlador_Operadores:
             self.mostrar_error(
                 "Error al editar",
                 str(e)
-            )
-
-    # ==================================================
-    # ELIMINAR FILA
-    # ==================================================
-
-    def eliminar_fila(self, fila):
-
-        try:
-
-            respuesta = QMessageBox.question(
-                self.window,
-                "Confirmar eliminación",
-                "¿Desea eliminar el registro?",
-                QMessageBox.StandardButton.Yes |
-                QMessageBox.StandardButton.No
-            )
-
-            if respuesta != QMessageBox.StandardButton.Yes:
-                return
-
-            id_operador = str(
-                self.df.iloc[fila, 0]
-            )
-
-            # REGISTRAR ELIMINACION
-
-            self.cambios["eliminar"].append(
-                id_operador
-            )
-
-            # ELIMINAR
-
-            self.df.drop(
-                index=self.df.index[fila],
-                inplace=True
-            )
-
-            self.df.reset_index(
-                drop=True,
-                inplace=True
-            )
-
-            # ACTUALIZAR TABLA
-
-            self.modelo_tabla._df = self.df
-            self.modelo_tabla.layoutChanged.emit()
-
-            self.mostrar_info(
-                "Fila eliminada",
-                "Registro eliminado correctamente."
-            )
-
-        except Exception as e:
-
-            self.mostrar_error(
-                "Error al eliminar",
-                f"No se Logro Eliminar el Registro  {e}"
             )
 
     # ==================================================
@@ -501,6 +540,10 @@ class Controlador_Operadores:
                 ],
                 ignore_index=True
             )
+            
+            # ACTUALIZAR MAPEO
+            
+            self._actualizar_mapeo_indices()
 
             # ACTUALIZAR TABLA
 
@@ -535,12 +578,12 @@ class Controlador_Operadores:
                     self.cambios["eliminar"]
                 )
 
-            for fila, cambios_fila in self.cambios["editar"].items():
+            for indice_original, cambios_fila in self.cambios["editar"].items():
 
                 for columna, nuevo_valor in cambios_fila.items():
 
                     df_actualizado.at[
-                        fila,
+                        indice_original,
                         columna
                     ] = nuevo_valor
 
@@ -567,6 +610,10 @@ class Controlador_Operadores:
 
             self.df = df_actualizado.copy()
             self.df_original = df_actualizado.copy()
+            
+            # ACTUALIZAR MAPEO TRAS GUARDAR
+            
+            self._actualizar_mapeo_indices()
 
             resumen = (
                 f"Editados: "
@@ -609,6 +656,14 @@ class Controlador_Operadores:
 
         try:
             self.df = self.df_original.copy()
+            
+            # RESETEAR INDICES
+            
+            self.df.reset_index(drop=True, inplace=True)
+            
+            # ACTUALIZAR MAPEO
+            
+            self._actualizar_mapeo_indices()
 
             self.cambios = {
                 "editar": {},
