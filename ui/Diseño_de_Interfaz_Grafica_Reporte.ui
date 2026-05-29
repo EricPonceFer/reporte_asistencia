@@ -78,7 +78,7 @@
        <number>-5</number>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="Reporte_Asistencia">
        <layout class="QVBoxLayout" name="verticalLayout" stretch="3,10">
@@ -1038,7 +1038,7 @@ border-bottom: 2px solid blue;
                   <rect>
                    <x>30</x>
                    <y>20</y>
-                   <width>89</width>
+                   <width>101</width>
                    <height>20</height>
                   </rect>
                  </property>
@@ -1063,7 +1063,7 @@ border-bottom: 2px solid blue;
                   <rect>
                    <x>30</x>
                    <y>60</y>
-                   <width>111</width>
+                   <width>121</width>
                    <height>20</height>
                   </rect>
                  </property>
@@ -1588,12 +1588,12 @@ QCalendarWidget QAbstractItemView:enabled {
                  </property>
                  <property name="dateTime">
                   <datetime>
-                   <hour>20</hour>
+                   <hour>6</hour>
                    <minute>0</minute>
                    <second>0</second>
                    <year>2026</year>
                    <month>1</month>
-                   <day>1</day>
+                   <day>2</day>
                   </datetime>
                  </property>
                  <property name="calendarPopup">
@@ -1672,7 +1672,7 @@ QPushButton:pressed {
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton#btn_eliminar {
-    background-color: #e74c3c;
+    background-color: #3498db;
     color: black;
     border: none;
     border-radius: 10px;
@@ -1681,11 +1681,11 @@ QPushButton:pressed {
 }
 
 QPushButton#btn_eliminar:hover {
-    background-color: #cb4335;
+    background-color: #2e86c1;
 }
 
 QPushButton#btn_eliminar:pressed {
-    background-color: #a93226;
+    background-color: #21618c;
 }</string>
                  </property>
                  <property name="text">
@@ -1725,7 +1725,7 @@ QPushButton:pressed {
                   <string>GUARDAR</string>
                  </property>
                 </widget>
-                <widget class="QPushButton" name="btn_crear_op_2">
+                <widget class="QPushButton" name="btn_crear_vl">
                  <property name="geometry">
                   <rect>
                    <x>80</x>

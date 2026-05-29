@@ -135,7 +135,7 @@ class Controlador_Velada:
                 self.df_original = self.df_original.sort_values(
                     by="Fecha Inicio",
                     ascending=False
-                ).reset_index(drop=True)
+                )
             
             # COPIAR PARA LA TABLA
             
@@ -257,8 +257,7 @@ class Controlador_Velada:
                 ascending=False
             ).copy()
 
-            self.df.reset_index(drop=True, inplace=True)
-
+            # NO RESETEAR INDICES - Mantener referencias a df_original
             self._actualizar_mapeo_indices()
 
             # ==========================================
@@ -365,13 +364,7 @@ class Controlador_Velada:
                     columna
                 ]
 
-                tipo_original = type(
-                    valor_original
-                )
-
-                # ==========================================
-                # VALIDAR SEGUN TIPO DE DATO
-                # ==========================================
+                tipo_original = type(valor_original)
 
                 nuevo_valor = self._validar_tipo_dato(
                     nuevo_valor,
@@ -383,20 +376,14 @@ class Controlador_Velada:
                     return
 
                 if indice_original not in self.cambios["editar"]:
-
                     self.cambios["editar"][indice_original] = {}
 
-                self.cambios["editar"][indice_original][
-                    columna
-                ] = nuevo_valor
+                self.cambios["editar"][indice_original][columna] = nuevo_valor
 
-                self.df.at[
-                    posicion_visual,
-                    columna
-                ] = nuevo_valor
+                # ✅ Usar indice_original en lugar de posicion_visual
+                self.df.at[indice_original, columna] = nuevo_valor
 
                 self.modelo_tabla._df = self.df
-
                 self.modelo_tabla.layoutChanged.emit()
 
                 self.mostrar_info(
@@ -589,17 +576,14 @@ class Controlador_Velada:
                 indice_original
             )
 
-            # ELIMINAR DE DATAFRAME FILTRADO
+            # ELIMINAR DE DATAFRAME FILTRADO usando el índice real
 
             self.df.drop(
-                index=posicion_visual,
+                index=indice_original,
                 inplace=True
             )
 
-            self.df.reset_index(
-                drop=True,
-                inplace=True
-            )
+            # NO RESETEAR - Mantener referencias a df_original
             
             # ACTUALIZAR MAPEO
             
@@ -656,12 +640,15 @@ class Controlador_Velada:
             # AGREGAR A DATAFRAME TEMPORAL
 
             import pandas as pd
+            
+            # Crear serie con índice apropiado para mantener consistencia
+            nuevo_indice = max(self.df.index) + 1 if len(self.df) > 0 else 0
             self.df = pd.concat(
                 [
                     self.df,
-                    pd.DataFrame([nueva_fila])
+                    pd.DataFrame([nueva_fila], index=[nuevo_indice])
                 ],
-                ignore_index=True
+                ignore_index=False
             )
             
             # ACTUALIZAR MAPEO
@@ -722,7 +709,7 @@ class Controlador_Velada:
                         df_actualizado,
                         df_nuevas
                     ],
-                    ignore_index=True
+                    ignore_index=False
                 )
 
             df_actualizado = df_actualizado.reset_index(drop=True)
@@ -732,10 +719,18 @@ class Controlador_Velada:
                 index=False
             )
 
-            self.df = df_actualizado.copy()
-            self.df_original = df_actualizado.copy()
+            # Recargar desde CSV con índices consistentes
+            self.df_original = self.modelo.cargar_csv(RUTA_VELADA)
             
-            # ACTUALIZAR MAPEO TRAS GUARDAR
+            if "Fecha Inicio" in self.df_original.columns:
+                self.df_original = self.df_original.sort_values(
+                    by="Fecha Inicio",
+                    ascending=False
+                )
+            
+            self.df = self.df_original.copy()
+            
+            # ACTUALIZAR MAPEO
             
             self._actualizar_mapeo_indices()
 
@@ -792,9 +787,7 @@ class Controlador_Velada:
                     ascending=False
                 ).copy()
             
-            # RESETEAR INDICES
-            
-            self.df.reset_index(drop=True, inplace=True)
+            # NO RESETEAR INDICES - Mantener referencias a df_original
             
             # ACTUALIZAR MAPEO
             

@@ -198,7 +198,7 @@ class Ui_MainWindow(object):
         self.dt_final.setCorrectionMode(QtWidgets.QAbstractSpinBox.CorrectionMode.CorrectToPreviousValue)
         self.dt_final.setCalendarPopup(True)
         self.dt_final.setTimeSpec(QtCore.Qt.TimeSpec.LocalTime)
-        self.dt_final.setDate(QtCore.QDate.currentDate())
+        self.dt_final.setDate(QtCore.QDate(2025, 12, 31))
         self.dt_final.setObjectName("dt_final")
         self.horizontalLayout_5.addWidget(self.dt_final)
         self.verticalLayout_3.addWidget(self.frame_8)
@@ -556,18 +556,26 @@ class Ui_MainWindow(object):
         self.frame_14.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.frame_14.setObjectName("frame_14")
         self.rb_Disponibles = QtWidgets.QRadioButton(parent=self.frame_14)
-        self.rb_Disponibles.setGeometry(QtCore.QRect(30, 20, 89, 20))
+        self.rb_Disponibles.setGeometry(QtCore.QRect(30, 20, 101, 20))
         font = QtGui.QFont()
         font.setFamily("Poppins")
         font.setBold(True)
         self.rb_Disponibles.setFont(font)
+        self.rb_Disponibles.setStyleSheet("QRadioButton::indicator:checked {\n"
+"    background-color: rgb(70, 130, 255);\n"
+"    border: 2px solid rgb(40, 90, 200);\n"
+"}")
         self.rb_Disponibles.setObjectName("rb_Disponibles")
         self.rb_NDisponibles = QtWidgets.QRadioButton(parent=self.frame_14)
-        self.rb_NDisponibles.setGeometry(QtCore.QRect(30, 60, 111, 20))
+        self.rb_NDisponibles.setGeometry(QtCore.QRect(30, 60, 121, 20))
         font = QtGui.QFont()
         font.setFamily("Poppins")
         font.setBold(True)
         self.rb_NDisponibles.setFont(font)
+        self.rb_NDisponibles.setStyleSheet("QRadioButton::indicator:checked {\n"
+"    background-color: rgb(70, 130, 255);\n"
+"    border: 2px solid rgb(40, 90, 200);\n"
+"}")
         self.rb_NDisponibles.setObjectName("rb_NDisponibles")
         self.btn_buscar_op = QtWidgets.QPushButton(parent=self.frame_14)
         self.btn_buscar_op.setGeometry(QtCore.QRect(160, 20, 101, 41))
@@ -594,7 +602,7 @@ class Ui_MainWindow(object):
         self.frame_15.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.frame_15.setObjectName("frame_15")
         self.btn_guardar_op = QtWidgets.QPushButton(parent=self.frame_15)
-        self.btn_guardar_op.setGeometry(QtCore.QRect(20, 30, 101, 41))
+        self.btn_guardar_op.setGeometry(QtCore.QRect(20, 10, 101, 41))
         self.btn_guardar_op.setStyleSheet("QPushButton {\n"
 "    background-color: rgb(255, 247, 135);\n"
 "    color: rgb(40, 40, 40);\n"
@@ -615,7 +623,7 @@ class Ui_MainWindow(object):
 "}")
         self.btn_guardar_op.setObjectName("btn_guardar_op")
         self.btn_recargar = QtWidgets.QPushButton(parent=self.frame_15)
-        self.btn_recargar.setGeometry(QtCore.QRect(160, 30, 101, 41))
+        self.btn_recargar.setGeometry(QtCore.QRect(150, 10, 101, 41))
         self.btn_recargar.setStyleSheet("QPushButton#btn_recargar {\n"
 "    background-color: #3498db;\n"
 "    color: black;\n"
@@ -633,6 +641,27 @@ class Ui_MainWindow(object):
 "    background-color: #21618c;\n"
 "}")
         self.btn_recargar.setObjectName("btn_recargar")
+        self.btn_crear_op = QtWidgets.QPushButton(parent=self.frame_15)
+        self.btn_crear_op.setGeometry(QtCore.QRect(90, 60, 101, 41))
+        self.btn_crear_op.setStyleSheet("QPushButton {\n"
+"    background-color: rgb(46, 204, 113);\n"
+"    color: black;\n"
+"    border: 1px solid rgb(39, 174, 96);\n"
+"    border-radius: 12px;\n"
+"    padding: 10px;\n"
+"    font-weight: bold;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    background-color: rgb(39, 174, 96);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: rgb(30, 132, 73);\n"
+"    padding-left: 11px;\n"
+"    padding-top: 11px;\n"
+"}")
+        self.btn_crear_op.setObjectName("btn_crear_op")
         self.verticalLayout_5.addWidget(self.frame_15)
         self.horizontalLayout_6.addWidget(self.frame_11)
         self.horizontalLayout_6.setStretch(0, 2)
@@ -862,7 +891,7 @@ class Ui_MainWindow(object):
         self.dt_velada_fecha.setWrapping(False)
         self.dt_velada_fecha.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.UpDownArrows)
         self.dt_velada_fecha.setKeyboardTracking(True)
-        self.dt_velada_fecha.setDateTime(QtCore.QDateTime(QtCore.QDate(2026, 1, 1), QtCore.QTime(10, 0, 0)))
+        self.dt_velada_fecha.setDateTime(QtCore.QDateTime(QtCore.QDate(2026, 1, 2), QtCore.QTime(6, 0, 0)))
         self.dt_velada_fecha.setCalendarPopup(True)
         self.dt_velada_fecha.setObjectName("dt_velada_fecha")
         self.label_16 = QtWidgets.QLabel(parent=self.frame_20)
@@ -898,9 +927,9 @@ class Ui_MainWindow(object):
         self.frame_21.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.frame_21.setObjectName("frame_21")
         self.btn_eliminar = QtWidgets.QPushButton(parent=self.frame_21)
-        self.btn_eliminar.setGeometry(QtCore.QRect(160, 30, 101, 41))
+        self.btn_eliminar.setGeometry(QtCore.QRect(150, 10, 101, 41))
         self.btn_eliminar.setStyleSheet("QPushButton#btn_eliminar {\n"
-"    background-color: #e74c3c;\n"
+"    background-color: #3498db;\n"
 "    color: black;\n"
 "    border: none;\n"
 "    border-radius: 10px;\n"
@@ -909,15 +938,15 @@ class Ui_MainWindow(object):
 "}\n"
 "\n"
 "QPushButton#btn_eliminar:hover {\n"
-"    background-color: #cb4335;\n"
+"    background-color: #2e86c1;\n"
 "}\n"
 "\n"
 "QPushButton#btn_eliminar:pressed {\n"
-"    background-color: #a93226;\n"
+"    background-color: #21618c;\n"
 "}")
         self.btn_eliminar.setObjectName("btn_eliminar")
         self.btn_guardar_vl = QtWidgets.QPushButton(parent=self.frame_21)
-        self.btn_guardar_vl.setGeometry(QtCore.QRect(20, 30, 101, 41))
+        self.btn_guardar_vl.setGeometry(QtCore.QRect(10, 10, 101, 41))
         self.btn_guardar_vl.setStyleSheet("QPushButton {\n"
 "    background-color: rgb(255, 247, 135);\n"
 "    color: rgb(40, 40, 40);\n"
@@ -937,6 +966,27 @@ class Ui_MainWindow(object):
 "    padding-top: 11px;\n"
 "}")
         self.btn_guardar_vl.setObjectName("btn_guardar_vl")
+        self.btn_crear_vl = QtWidgets.QPushButton(parent=self.frame_21)
+        self.btn_crear_vl.setGeometry(QtCore.QRect(80, 60, 101, 41))
+        self.btn_crear_vl.setStyleSheet("QPushButton {\n"
+"    background-color: rgb(46, 204, 113);\n"
+"    color: black;\n"
+"    border: 1px solid rgb(39, 174, 96);\n"
+"    border-radius: 12px;\n"
+"    padding: 10px;\n"
+"    font-weight: bold;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    background-color: rgb(39, 174, 96);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: rgb(30, 132, 73);\n"
+"    padding-left: 11px;\n"
+"    padding-top: 11px;\n"
+"}")
+        self.btn_crear_vl.setObjectName("btn_crear_vl")
         self.verticalLayout_7.addWidget(self.frame_21)
         self.horizontalLayout_7.addWidget(self.frame_18)
         self.horizontalLayout_7.setStretch(0, 2)
@@ -1048,7 +1098,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.Contenido.setCurrentIndex(2)
+        self.Contenido.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -1069,19 +1119,11 @@ class Ui_MainWindow(object):
         self.btn_buscar_op.setText(_translate("MainWindow", "BUSCAR"))
         self.btn_guardar_op.setText(_translate("MainWindow", "GUARDAR"))
         self.btn_recargar.setText(_translate("MainWindow", "RECARGAR"))
+        self.btn_crear_op.setText(_translate("MainWindow", "CREAR"))
         self.label_11.setText(_translate("MainWindow", "PERSONAL DE VELADA"))
         self.label_15.setText(_translate("MainWindow", "Nombre/Codigo Operador:"))
         self.label_16.setText(_translate("MainWindow", "Fecha de Busqueda:"))
         self.btn_buscar_vl.setText(_translate("MainWindow", "BUSCAR"))
         self.btn_eliminar.setText(_translate("MainWindow", "RECARGAR"))
         self.btn_guardar_vl.setText(_translate("MainWindow", "GUARDAR"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec())
+        self.btn_crear_vl.setText(_translate("MainWindow", "CREAR"))

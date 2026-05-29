@@ -251,10 +251,6 @@ class Controlador_Operadores:
                 filtro
             ].copy()
             
-            # RESETEAR INDICES PARA CONSISTENCIA
-            
-            self.df.reset_index(drop=True, inplace=True)
-            
             # ACTUALIZAR MAPEO DE INDICES
             
             self._actualizar_mapeo_indices()
@@ -309,10 +305,6 @@ class Controlador_Operadores:
             accion_modificar = menu.addAction(
                 "Modificar"
             )
-
-            # accion_eliminar = menu.addAction(
-            #     "Eliminar"
-            # )
 
             accion = menu.exec(
                 self.ui.tb_operadores
@@ -395,7 +387,7 @@ class Controlador_Operadores:
                 ] = nuevo_valor
 
                 self.df.at[
-                    posicion_visual,
+                    indice_original,
                     columna
                 ] = nuevo_valor
 
@@ -656,10 +648,7 @@ class Controlador_Operadores:
 
         try:
             self.df = self.df_original.copy()
-            
-            # RESETEAR INDICES
-            
-            self.df.reset_index(drop=True, inplace=True)
+
             
             # ACTUALIZAR MAPEO
             
@@ -674,6 +663,7 @@ class Controlador_Operadores:
             self.modelo_tabla._df = self.df
 
             self.modelo_tabla.layoutChanged.emit()
+            self.ui.tb_operadores.resizeColumnsToContents()
 
             self.mostrar_info(
                 "Datos actualizados",
